@@ -11,12 +11,17 @@ This migration adds critical indexes for:
 
 import sqlite3
 import sys
+import argparse
 from pathlib import Path
+
+parser = argparse.ArgumentParser(description='Optimize semantic search')
+parser.add_argument('--db-path', default='./music.db', help='Path to database file')
+args = parser.parse_args()
 
 def create_semantic_search_indexes():
     """Create optimized indexes for semantic search performance."""
-    
-    db_path = Path(__file__).parent.parent / "music.db"
+
+    db_path = Path(args.db_path)
     
     if not db_path.exists():
         print(f"❌ Database not found at {db_path}")

@@ -3,13 +3,19 @@
 import os
 import shutil
 import sqlite3
+import argparse
 from datetime import datetime, timezone
 from pathlib import Path
 
+parser = argparse.ArgumentParser(description='Backup database')
+parser.add_argument('--db-path', default='./music.db', help='Path to database file')
+parser.add_argument('--backup-dir', default='./backups', help='Directory for backups')
+args = parser.parse_args()
+
 def backup_database():
     """Create a timestamped backup of the music database."""
-    db_path = "/app/music.db"
-    backup_dir = "/app/backups"
+    db_path = args.db_path
+    backup_dir = args.backup_dir
     
     # Create backup directory if it doesn't exist
     os.makedirs(backup_dir, exist_ok=True)
@@ -32,13 +38,14 @@ def backup_database():
     shutil.copy2(db_path, latest_path)
     
     # Clean up old backups (keep last 7 days)
-    cleanup_old_backups(backup_dir)
+    cleanup_old_backups()
     
     print(f"✅ Backup created: {backup_path}")
     return True
 
-def cleanup_old_backups(backup_dir):
+def cleanup_old_backups():
     """Remove backups older than 7 days."""
+    backup_dir = args.backup_dir
     cutoff = datetime.now().timestamp() - (7 * 24 * 60 * 60)
     
     for filename in os.listdir(backup_dir):
@@ -50,8 +57,8 @@ def cleanup_old_backups(backup_dir):
 
 def restore_from_backup(backup_file=None):
     """Restore database from a backup file."""
-    db_path = "/app/music.db"
-    backup_dir = "/app/backups"
+    db_path = args.db_path
+    backup_dir = args.backup_dir
     
     if backup_file is None:
         # Use latest backup

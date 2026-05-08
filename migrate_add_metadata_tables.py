@@ -2,11 +2,16 @@
 """add artist and album metadata tables for deep discovery."""
 
 import sqlite3
+import argparse
+
+parser = argparse.ArgumentParser(description='Add metadata tables')
+parser.add_argument('--db-path', default='./music.db', help='Path to database file')
+args = parser.parse_args()
 
 def upgrade():
     """create artist_metadata and album_metadata tables."""
 
-    db_path = "backend/music.db"
+    db_path = args.db_path
     print(f"Using database: {db_path}")
 
     conn = sqlite3.connect(db_path)

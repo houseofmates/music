@@ -8,7 +8,13 @@ import sqlite3
 import os
 import sys
 
-DATABASE_PATH = os.path.join(os.path.dirname(__file__), "music.db")
+import argparse
+
+parser = argparse.ArgumentParser(description='Add indexes')
+parser.add_argument('--db-path', default='./music.db', help='Path to database file')
+args = parser.parse_args()
+
+DATABASE_PATH = args.db_path
 
 INDEXES = [
     "CREATE INDEX IF NOT EXISTS idx_tracks_filename ON tracks(filename)",

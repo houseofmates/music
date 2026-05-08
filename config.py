@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./music.db"
 
     # Music Directory
-    music_dir: str = "/mnt/nextcloud/house/files/media/music"
+    music_dir: str = "/path/to/music"
 
     # External APIs
     acoustid_api_key: str = ""

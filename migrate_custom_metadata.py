@@ -6,8 +6,13 @@ This protects user-edited song titles, artists, albums from being overwritten.
 
 import sqlite3
 import os
+import argparse
 
-DB_PATH = "/home/house/Documents/docker/music_app/music.db"
+parser = argparse.ArgumentParser(description='Migrate custom metadata')
+parser.add_argument('--db-path', default='./music.db', help='Path to database file')
+args = parser.parse_args()
+
+DB_PATH = args.db_path
 
 def migrate():
     """Add is_custom_metadata column to tracks table."""

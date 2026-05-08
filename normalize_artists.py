@@ -2,7 +2,13 @@
 """Script to normalize artist data in the database."""
 
 import sys
-sys.path.insert(0, '/home/house/Documents/docker/music_app/backend')
+import argparse
+
+parser = argparse.ArgumentParser(description='Normalize artists')
+parser.add_argument('--backend-path', default='.', help='Path to backend directory')
+args = parser.parse_args()
+
+sys.path.insert(0, args.backend_path)
 
 from database import Session, engine
 from models import Track

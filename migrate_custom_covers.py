@@ -7,8 +7,13 @@ Run this once to protect existing custom covers.
 
 import sqlite3
 import os
+import argparse
 
-DB_PATH = "/home/house/Documents/docker/music_app/music.db"
+parser = argparse.ArgumentParser(description='Migrate custom covers')
+parser.add_argument('--db-path', default='./music.db', help='Path to database file')
+args = parser.parse_args()
+
+DB_PATH = args.db_path
 
 def migrate():
     """Mark all data URI covers as custom."""

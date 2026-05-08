@@ -2,7 +2,13 @@
 """Add featured_artists column to tracks table."""
 
 import sys
-sys.path.insert(0, '/home/house/Documents/docker/music_app/backend')
+import argparse
+
+parser = argparse.ArgumentParser(description='Add featured_artists column')
+parser.add_argument('--backend-path', default='.', help='Path to backend directory')
+args = parser.parse_args()
+
+sys.path.insert(0, args.backend_path)
 
 import sqlite3
 from config import settings
@@ -10,7 +16,7 @@ from config import settings
 # Get database path from settings
 db_path = settings.database_url.replace('sqlite:///', '')
 if db_path.startswith('./'):
-    db_path = '/home/house/Documents/docker/music_app/backend/' + db_path[2:]
+    db_path = args.backend_path + '/' + db_path[2:]
 
 print(f"Using database: {db_path}")
 
