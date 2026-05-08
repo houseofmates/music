@@ -6,30 +6,27 @@ import logging
 
 class Settings(BaseSettings):
     """Application configuration settings."""
-    
+
     # Application
     app_name: str = "pkm"
     app_version: str = "1.0.0"
     debug: bool = False
-    
+
     # Server
     host: str = "0.0.0.0"
     port: int = 8000
-    
+
     # Database
     database_url: str = "sqlite:///./music.db"
-    
+
     # Music Directory
-    # previously `/mnt/nextcloud/nextcloud/media/music` –
-    # the mounted Nextcloud directory where all music files reside
-    # changed per user request to new location below.
     music_dir: str = "/mnt/nextcloud/house/files/media/music"
-    
+
     # External APIs
     acoustid_api_key: str = ""
-    musicbrainz_user_agent: str = "pkm-music-app/1.0 (contact@yourdomain.com)"
+    musicbrainz_user_agent: str = "pkm-music-app/1.0 (your-email@example.com)"
     # CORS - allow all for desktop apps (file:// protocol) and specific domain
-    cors_origins: Union[List[str], str] = ["*", "https://music.houseofmates.space", "http://music.houseofmates.space"]
+    cors_origins: Union[List[str], str] = ["*"]
 
     # Auth
     jwt_secret_key: str = ""
