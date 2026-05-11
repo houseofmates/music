@@ -387,6 +387,18 @@ async def get_player_state(
         if track:
             current_track = _to_track_dict(track)
 
+    queue_stmt = select(QueueItem, Track).join(Track, QueueItem.track_id == Track.id)
+    if user_id:
+        queue_stmt = queue_stmt.where(QueueItem.user_id == user_id)
+    else:
+        queue_stmt = queue_stmt.where(QueueItem.user_id == None)
+    queue_stmt = queue_stmt.order_by(QueueItem.position)
+    queue_items = session.exec(queue_stmt).all()
+    queue = [
+        {"id": qi.id, "track_id": t.id, "position": qi.position, "track": _to_track_dict(t)}
+        for qi, t in queue_items
+    ]
+
     return {
         "current_track_id": state.current_track_id,
         "current_track": current_track,
@@ -396,6 +408,7 @@ async def get_player_state(
         "repeat_mode": state.repeat_mode,
         "shuffle": state.shuffle,
         "updated_at": state.updated_at.isoformat() if state.updated_at else None,
+        "queue": queue,
     }
 
 
