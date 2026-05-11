@@ -27,3 +27,4 @@ coverage.xml
 .DS_Store
 .vscode/
 .idea/.jwt_secret
+.jwt_secret
