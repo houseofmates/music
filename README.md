@@ -1,93 +1,102 @@
-# music
+<h1 align=center>music</h1>
 
-A self-hosted, high-performance music streaming server with advanced discovery features.
+a self-hosted, high-performance music streaming server with advanced discovery features.
 
-## Features
+<h2 align=center>features</h2>
 
-- **Local Music Library** - Organize and stream your personal music collection
-- **Advanced Search** - Semantic search with embeddings for finding songs by lyrics, mood, or description
-- **AI-Powered Discovery** - Discover new music based on your listening habits
-- **Collaborative Playlists** - Create and share playlists with friends
-- **Offline Access** - Mobile app support with passcode authentication
-- **High-Quality Audio** - Supports various audio formats (MP3, FLAC, etc.)
-- **Web Interface** - Modern web UI for browsing and playing music
-- **API Server** - RESTful API for integration with mobile apps and other services
+- **local music library** - organize and stream your personal music collection
+- **advanced search** - semantic search with embeddings for finding songs by lyrics, mood, or description
+- **ai-powered discovery** - discover new music based on your listening habits
+- **collaborative playlists** - create and share playlists with friends
+- **offline access** - mobile app support with passcode authentication
+- **high-quality audio** - supports various audio formats (mp3, flac, etc.)
+- **web interface** - modern web ui for browsing and playing music
+- **api server** - restful api for integration with mobile apps and other services
 
-## Installation
+<h2 align=center>installation</h2>
 
-### Prerequisites
+<h3 align=center>prerequisites</h3>
 
-- Python 3.10+
-- PostgreSQL or SQLite (default)
-- OLLAMA (optional, for AI features)
-- FFmpeg (for audio processing)
+- python 3.10+
+- postgresql or sqlite (default)
+- ollama (optional, for ai features)
+- ffmpeg (for audio processing)
 
-### Step-by-Step
+<h3 align=center>step-by-step</h3>
 
-1. **Clone the repository:**
-   
+1. **clone the repository:**
 
-2. **Install dependencies:**
-   
 
-3. **Configure environment:**
-   
-   Edit  to set your configuration:
-   - : Path to your music collection
-   - : (Optional) API key for acoustic fingerprinting
-   - : URL of your OLLAMA server (default: http://127.0.0.1:11434)
-   -  and : For mobile app offline authentication
 
-4. **Initialize the database:**
-   
+2. **install dependencies:**
 
-5. **Start the server:**
-   
-   The server will be available at http://localhost:8000
 
-## Configuration
 
-### Environment Variables
+3. **configure environment:**
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-|  |  | Directory containing your music files |
-|  |  | Database connection string |
-|  | (empty) | API key for AcoustID fingerprinting |
-|  |  | User agent for MusicBrainz API |
-|  |  | URL for OLLAMA server (AI features) |
-|  | (empty) | Username for mobile app passcode authentication |
-|  | (empty) | Bcrypt hash of the passcode password |
-|  | (auto-generated) | Secret key for JWT tokens (set for production) |
-|  |  | Server host |
-|  |  | Server port |
 
-### Passcode Authentication
 
-For mobile app offline access, you can set up passcode authentication:
+edit  to set your configuration:
+- : path to your music collection
+- : (optional) api key for acoustic fingerprinting
+- : url of your ollama server (default: http://127.0.0.1:11434)
+-  and : for mobile app offline authentication
 
-1. Choose a username and password
-2. Generate a bcrypt hash:
-   
-3. Set  and  in your  file
+4. **initialize the database:**
 
-## Usage
 
-### Web Interface
 
-Navigate to http://localhost:8000 in your browser to access the web UI.
+5. **start the server:**
 
-### API
 
-The server provides a RESTful API at . See the [API Documentation](docs/api.md) for details.
 
-### Mobile App
+the server will be available at http://localhost:8000
 
-Use the official mobile app with the passcode authentication or JWT tokens.
+<h2 align=center>configuration</h2>
 
-## Development
+<h3 align=center>environment variables</h3>
 
-### Running Tests
+| variable | default | description |
+|---|---|---|
+|  |  | directory containing your music files |
+|  |  | database connection string |
+|  | (empty) | api key for acoustid fingerprinting |
+|  |  | user agent for musicbrainz api |
+|  |  | url for ollama server (ai features) |
+|  | (empty) | username for mobile app passcode authentication |
+|  | (empty) | bcrypt hash of the passcode password |
+|  | (auto-generated) | secret key for jwt tokens (set for production) |
+|  |  | server host |
+|  |  | server port |
+
+<h3 align=center>passcode authentication</h3>
+
+for mobile app offline access, you can set up passcode authentication:
+
+1. choose a username and password
+2. generate a bcrypt hash:
+
+
+
+3. set  and  in your  file
+
+<h2 align=center>usage</h2>
+
+<h3 align=center>web interface</h3>
+
+navigate to http://localhost:8000 in your browser to access the web ui.
+
+<h3 align=center>api</h3>
+
+the server provides a restful api at . see the api documentation for details.
+
+<h3 align=center>mobile app</h3>
+
+use the official mobile app with the passcode authentication or jwt tokens.
+
+<h2 align=center>development</h2>
+
+<h3 align=center>running tests</h3>
 
 ============================= test session starts ==============================
 platform linux -- Python 3.14.3, pytest-9.0.3, pluggy-1.6.0
@@ -99,24 +108,24 @@ created: 8/8 workers
 8 workers [0 items]
 
 
-============================ no tests ran in 0.63s =============================
+============================ no tests ran in 0.68s =============================
 
-### Code Style
+<h3 align=center>code style</h3>
 
-We use Black for code formatting and Ruff for linting.
+we use black for code formatting and ruff for linting.
 
-## Contributing
+<h2 align=center>contributing</h2>
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+1. fork the repository
+2. create a feature branch
+3. make your changes
+4. add tests if applicable
+5. submit a pull request
 
-## License
+<h2 align=center>license</h2>
 
-MIT License (see LICENSE file for details)
+mit license (see license file for details)
 
-## Security
+<h2 align=center>security</h2>
 
-If you discover a security vulnerability, please report it to the project maintainers directly.
+if you discover a security vulnerability, please report it to the project maintainers directly.
