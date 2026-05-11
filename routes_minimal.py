@@ -454,8 +454,15 @@ async def update_player_state(
     session.commit()
     session.refresh(state)
 
+    current_track = None
+    if state.current_track_id is not None:
+        track = session.get(Track, state.current_track_id)
+        if track:
+            current_track = _to_track_dict(track)
+
     return {
         "current_track_id": state.current_track_id,
+        "current_track": current_track,
         "current_position": state.current_position,
         "is_playing": state.is_playing,
         "volume": state.volume,
