@@ -1,7 +1,8 @@
 from sqlmodel import create_engine, SQLModel, Session
 from sqlalchemy.orm import sessionmaker
 from config import settings
-import models_minimal  # noqa: F401  # ensures model metadata is registered
+# Use full models for metadata registration
+import models as models  # noqa: F401  # ensures model metadata is registered
 
 # Create database engine
 engine = create_engine(

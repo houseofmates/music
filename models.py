@@ -92,9 +92,12 @@ class Playlist(SQLModel, table=True):
 
     # Relationships
     owner: Optional["User"] = Relationship(back_populates="playlists")
-    sleep_timers: List["SleepTimer"] = Relationship(back_populates="user")
+    sleep_timers: List["SleepTimer"] = Relationship(back_populates="playlist")
     tracks: List["PlaylistTrack"] = Relationship(back_populates="playlist")
     collaborators: List["PlaylistCollaborator"] = Relationship(back_populates="playlist")
+    alarms: List["Alarm"] = Relationship(back_populates="playlist")
+    sleep_config: Optional["SleepPlaylist"] = Relationship(back_populates="playlist")
+    sleep_schedules: List["SleepSchedule"] = Relationship(back_populates="playlist")
 
 
 class PlaylistTrack(SQLModel, table=True):
@@ -177,20 +180,22 @@ class User(SQLModel, table=True):
     password_hash: str
     created_at: datetime = Field(default_factory=now_utc)
     updated_at: datetime = Field(default_factory=now_utc)
-    
     # Relationships
-    player_states: List["PlayerState"] = Relationship(back_populates="user")
-
     playlists: List["Playlist"] = Relationship(back_populates="owner")
     favorites: List["Favorite"] = Relationship(back_populates="user")
     history: List["PlayHistory"] = Relationship(back_populates="user")
     tags: List["TrackTag"] = Relationship(back_populates="user")
     settings: Optional["UserSettings"] = Relationship(back_populates="user", sa_relationship_kwargs={"uselist": False})
     share_links: List["ShareLink"] = Relationship(back_populates="user")
+    # Sleep-related relationships
+    sleep_timers: List["SleepTimer"] = Relationship(back_populates="user")
+    sleep_playlists: List["SleepPlaylist"] = Relationship(back_populates="user")
+    sleep_schedules: List["SleepSchedule"] = Relationship(back_populates="user")
     player_states: List["PlayerState"] = Relationship(back_populates="user")
     share_comments: List["ShareComment"] = Relationship(back_populates="user")
     added_tracks: List["PlaylistTrack"] = Relationship(back_populates="added_by")
     collaborative_playlists: List["PlaylistCollaborator"] = Relationship(back_populates="user")
+    alarms: List["Alarm"] = Relationship(back_populates="user")
 
 
 class Favorite(SQLModel, table=True):
@@ -516,9 +521,6 @@ class SleepTimer(SQLModel, table=True):
     duration_minutes: int  # Total sleep duration
     fade_out_minutes: int = Field(default=5)  # Fade-out period at end
     start_volume: float = Field(default=0.8)  # Initial volume (0.0-1.0)
-    
-    # Relationship back to User model
-    user: Optional["User"] = Relationship(back_populates="sleep_timers")
     end_volume: float = Field(default=0.0)  # Final volume (0.0-1.0)
 
     # Associated content
@@ -562,9 +564,13 @@ class SleepPlaylist(SQLModel, table=True):
     created_at: datetime = Field(default_factory=now_utc)
     updated_at: datetime = Field(default_factory=now_utc)
 
+    # Associated playlist link
+    playlist_id: Optional[int] = Field(default=None, foreign_key="playlists.id")
+
     # Relationships
     user: Optional["User"] = Relationship(back_populates="sleep_playlists")
-    playlist: "Playlist" = Relationship(back_populates="sleep_config")  # Links to actual playlist
+    # Link to the actual Playlist when needed
+    playlist: Optional["Playlist"] = Relationship(back_populates="sleep_config", sa_relationship_kwargs={"uselist": False})
 
 
 class SleepSchedule(SQLModel, table=True):
@@ -640,14 +646,3 @@ class Alarm(SQLModel, table=True):
     playlist: Optional["Playlist"] = Relationship(back_populates="alarms")
 
 
-# Update existing User model to include sleep/ambient relationships
-User.sleep_timers: List["SleepTimer"] = Relationship(back_populates="user")
-User.sleep_playlists: List["SleepPlaylist"] = Relationship(back_populates="user")
-User.sleep_schedules: List["SleepSchedule"] = Relationship(back_populates="user")
-User.alarms: List["Alarm"] = Relationship(back_populates="user")
-
-# Update Playlist model to include sleep relationships
-Playlist.sleep_timers: List["SleepTimer"] = Relationship(back_populates="playlist")
-Playlist.sleep_config: Optional["SleepPlaylist"] = Relationship(back_populates="playlist")
-Playlist.sleep_schedules: List["SleepSchedule"] = Relationship(back_populates="playlist")
-Playlist.alarms: List["Alarm"] = Relationship(back_populates="playlist")

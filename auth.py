@@ -7,7 +7,7 @@ from sqlmodel import Session, select
 
 from config import settings
 from database import get_session
-from models_minimal import User
+from models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token", auto_error=False)

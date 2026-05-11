@@ -35,6 +35,17 @@ def _ensure_music_directory_exists():
     return music_dir
 
 
+def _run_startup_migrations():
+    """Apply lightweight SQLite migrations that create_all cannot handle."""
+    try:
+        from migrate_add_collaborative_features import migrate_database
+        migrate_database()
+        logging.info("Startup migrations complete")
+    except Exception as e:
+        logging.error("Startup migrations failed: %s", e)
+        raise
+
+
 def _perform_initial_lowercase_pass(music_dir: Path):
     """Perform initial lowercase pass on music directory."""
     from file_watcher import initial_lowercase_pass
@@ -141,25 +152,26 @@ async def lifespan(app: FastAPI):
     
     # Startup
     create_db_and_tables()
+    _run_startup_migrations()
     logging.info("Database initialized")
     logging.info("Music directory: %s", settings.music_dir)
     
-    # Mark any stale "running" scans as failed (from previous crashes)
-    try:
-        from sqlmodel import Session, select
-        from database import engine
-        from models_minimal import ScanLog
-        with Session(engine) as session:
-            stmt = select(ScanLog).where(ScanLog.status == "running")
-            for scan in session.exec(stmt):
-                scan.status = "failed"
-                scan.errors = "Scan was interrupted (app restarted while scan was running)"
-                scan.completed_at = datetime.now(timezone.utc)
-                session.add(scan)
-            session.commit()
-            logging.info("Marked stale running scans as failed")
-    except (OSError, RuntimeError) as e:
-        logging.warning("Could not clean up stale scans: %s", e)
+#    # Mark any stale "running" scans as failed (from previous crashes)
+#    try:
+#        from sqlmodel import Session, select
+#        from database import engine
+#        from models import ScanLog
+#        with Session(engine) as session:
+#            stmt = select(ScanLog).where(ScanLog.status == "running")
+#            for scan in session.exec(stmt):
+#                scan.status = "failed"
+#                scan.errors = "Scan was interrupted (app restarted while scan was running)"
+#                scan.completed_at = datetime.now(timezone.utc)
+#                session.add(scan)
+#            session.commit()
+#            logging.info("Marked stale running scans as failed")
+#    except (OSError, RuntimeError) as e:
+#        logging.warning("Could not clean up stale scans: %s", e)
     
     # Start file watcher in background thread with non-blocking initial scan
     file_watcher_stop_event = threading.Event()
@@ -301,10 +313,7 @@ async def rate_limit_middleware(request: Request, call_next):
 # Include routers
 from routes_minimal import router as minimal_router
 app.include_router(minimal_router, prefix="/api")
-from radio_routes import router as radio_router
-from analytics_routes import router as analytics_router
-app.include_router(radio_router, prefix="/api")
-app.include_router(analytics_router, prefix="/api")
+# radio and analytics routes disabled in dev fallback to avoid importing full models
 
 
 @app.get("/")

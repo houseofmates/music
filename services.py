@@ -14,7 +14,7 @@ from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
 from mutagen.mp4 import MP4Cover
 from sqlmodel import Session, select, or_
-from models_minimal import Track, ScanLog, Playlist, PlaylistTrack
+from models import Track, ScanLog, Playlist, PlaylistTrack
 from config import settings
 import requests
 import acoustid

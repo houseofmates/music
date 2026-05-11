@@ -12,7 +12,7 @@ from fastapi.responses import FileResponse
 from sqlmodel import Session, select, func, or_, update, delete
 
 from database import get_session
-from models_minimal import Track, Playlist, PlaylistTrack, PlayerState, QueueItem, User, Favorite, PlayHistory
+from models import Track, Playlist, PlaylistTrack, PlayerState, QueueItem, User, Favorite, PlayHistory
 from auth import get_current_user_optional
 from config import settings
 from services import MetadataService
