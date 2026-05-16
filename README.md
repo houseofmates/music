@@ -122,10 +122,6 @@ we use black for code formatting and ruff for linting.
 4. add tests if applicable
 5. submit a pull request
 
-<h2 align=center>license</h2>
-
-mit license (see license file for details)
-
 <h2 align=center>security</h2>
 
 if you discover a security vulnerability, please report it to the project maintainers directly.
