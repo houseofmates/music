@@ -1,8 +1,8 @@
-<h1 align=center>music</h1>
+<h1 align="center">music</h1>
 
-a self-hosted, high-performance music streaming server with advanced discovery features.
+<p align="center">a self-hosted, high-performance music streaming server with advanced discovery features.</p>
 
-<h2 align=center>features</h2>
+<h2 align="center">features</h2>
 
 - **local music library** - organize and stream your personal music collection
 - **advanced search** - semantic search with embeddings for finding songs by lyrics, mood, or description
@@ -13,30 +13,24 @@ a self-hosted, high-performance music streaming server with advanced discovery f
 - **web interface** - modern web ui for browsing and playing music
 - **api server** - restful api for integration with mobile apps and other services
 
-<h2 align=center>installation</h2>
+<h2 align="center">installation</h2>
 
-<h3 align=center>prerequisites</h3>
+<h3 align="center">prerequisites</h3>
 
 - python 3.10+
 - postgresql or sqlite (default)
 - ollama (optional, for ai features)
 - ffmpeg (for audio processing)
 
-<h3 align=center>step-by-step</h3>
+<h3 align="center">step-by-step</h3>
 
 1. **clone the repository:**
 
-
-
 2. **install dependencies:**
-
-
 
 3. **configure environment:**
 
-
-
-edit  to set your configuration:
+<p align="center">edit to set your configuration:</p>
 - : path to your music collection
 - : (optional) api key for acoustic fingerprinting
 - : url of your ollama server (default: http://127.0.0.1:11434)
@@ -44,61 +38,62 @@ edit  to set your configuration:
 
 4. **initialize the database:**
 
-
-
 5. **start the server:**
 
+<p align="center">the server will be available at http://localhost:8000</p>
 
+<h2 align="center">configuration</h2>
 
-the server will be available at http://localhost:8000
+<h3 align="center">environment variables</h3>
 
-<h2 align=center>configuration</h2>
+<div align="center">
+<table>
+  <thead>
+    <tr><th>variable</th><th>default</th><th>description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td></td><td></td><td>directory containing your music files</td></tr>
+    <tr><td></td><td></td><td>database connection string</td></tr>
+    <tr><td></td><td>(empty)</td><td>api key for acoustid fingerprinting</td></tr>
+    <tr><td></td><td></td><td>user agent for musicbrainz api</td></tr>
+    <tr><td></td><td></td><td>url for ollama server (ai features)</td></tr>
+    <tr><td></td><td>(empty)</td><td>username for mobile app passcode authentication</td></tr>
+    <tr><td></td><td>(empty)</td><td>bcrypt hash of the passcode password</td></tr>
+    <tr><td></td><td>(auto-generated)</td><td>secret key for jwt tokens (set for production)</td></tr>
+    <tr><td></td><td></td><td>server host</td></tr>
+    <tr><td></td><td></td><td>server port</td></tr>
+  </tbody>
+</table>
+</div>
 
-<h3 align=center>environment variables</h3>
+<h3 align="center">passcode authentication</h3>
 
-| variable | default | description |
-|---|---|---|
-|  |  | directory containing your music files |
-|  |  | database connection string |
-|  | (empty) | api key for acoustid fingerprinting |
-|  |  | user agent for musicbrainz api |
-|  |  | url for ollama server (ai features) |
-|  | (empty) | username for mobile app passcode authentication |
-|  | (empty) | bcrypt hash of the passcode password |
-|  | (auto-generated) | secret key for jwt tokens (set for production) |
-|  |  | server host |
-|  |  | server port |
-
-<h3 align=center>passcode authentication</h3>
-
-for mobile app offline access, you can set up passcode authentication:
+<p align="center">for mobile app offline access, you can set up passcode authentication:</p>
 
 1. choose a username and password
 2. generate a bcrypt hash:
 
-
-
 3. set  and  in your  file
 
-<h2 align=center>usage</h2>
+<h2 align="center">usage</h2>
 
-<h3 align=center>web interface</h3>
+<h3 align="center">web interface</h3>
 
-navigate to http://localhost:8000 in your browser to access the web ui.
+<p align="center">navigate to http://localhost:8000 in your browser to access the web ui.</p>
 
-<h3 align=center>api</h3>
+<h3 align="center">api</h3>
 
-the server provides a restful api at . see the api documentation for details.
+<p align="center">the server provides a restful api at . see the api documentation for details.</p>
 
-<h3 align=center>mobile app</h3>
+<h3 align="center">mobile app</h3>
 
-use the official mobile app with the passcode authentication or jwt tokens.
+<p align="center">use the official mobile app with the passcode authentication or jwt tokens.</p>
 
-<h2 align=center>development</h2>
+<h2 align="center">development</h2>
 
-<h3 align=center>running tests</h3>
+<h3 align="center">running tests</h3>
 
-============================= test session starts ==============================
+<pre align="center"><code>============================= test session starts ==============================
 platform linux -- Python 3.14.3, pytest-9.0.3, pluggy-1.6.0
 rootdir: /home/house
 configfile: pyproject.toml
@@ -109,12 +104,13 @@ created: 8/8 workers
 
 
 ============================ no tests ran in 0.68s =============================
+</code></pre>
 
-<h3 align=center>code style</h3>
+<h3 align="center">code style</h3>
 
-we use black for code formatting and ruff for linting.
+<p align="center">we use black for code formatting and ruff for linting.</p>
 
-<h2 align=center>contributing</h2>
+<h2 align="center">contributing</h2>
 
 1. fork the repository
 2. create a feature branch
@@ -122,6 +118,10 @@ we use black for code formatting and ruff for linting.
 4. add tests if applicable
 5. submit a pull request
 
-<h2 align=center>security</h2>
+<h2 align="center">security</h2>
 
-if you discover a security vulnerability, please report it to the project maintainers directly.
+<p align="center">if you discover a security vulnerability, please report it to john@houseofmates.space</p>
+
+<h2 align="center">license</h2>
+
+<p align="center"><a href="license">mates license</a></p>
