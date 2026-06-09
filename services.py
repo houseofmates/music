@@ -410,6 +410,9 @@ class MetadataService:
                 "disc_number": None,
                 "duration": None,
                 "cover_art_url": None,
+                "leading_silence_ms": None,
+                "trailing_silence_ms": None,
+                "has_detected_gaps": False,
             }
             
             # Extract basic metadata
@@ -450,6 +453,18 @@ class MetadataService:
                         pass
             
             metadata["cover_art_url"] = MetadataService.extract_embedded_cover_art(file_path)
+            
+            # Detect silent gaps for dynamic crossfade (only for tracks > 30 seconds to avoid false positives)
+            if metadata["duration"] and metadata["duration"] > 30:
+                try:
+                    from gap_detection import GapDetectionService
+                    leading_ms, trailing_ms = GapDetectionService.detect_leading_trailing_silence(file_path)
+                    metadata["leading_silence_ms"] = leading_ms
+                    metadata["trailing_silence_ms"] = trailing_ms
+                    metadata["has_detected_gaps"] = True
+                except Exception as e:
+                    logger.warning(f"Gap detection failed for {file_path}: {e}")
+            
             return metadata
         except (OSError, MutagenFile.Error) as e:
             logger.error("Error extracting metadata from %s: %s", file_path, e)

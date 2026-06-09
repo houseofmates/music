@@ -55,6 +55,11 @@ class Track(SQLModel, table=True):
     lyrics: Optional[str] = None
     synced_lyrics: Optional[str] = None  # LRC format
 
+    # Silent gap detection for dynamic crossfade
+    leading_silence_ms: Optional[int] = Field(default=None)  # Silence at track start in milliseconds
+    trailing_silence_ms: Optional[int] = Field(default=None)  # Silence at track end in milliseconds
+    has_detected_gaps: bool = Field(default=False)  # Whether gap detection has been run
+
     # Timestamps
     created_at: datetime = Field(default_factory=now_utc)
     updated_at: datetime = Field(default_factory=now_utc)
@@ -143,6 +148,9 @@ class QueueItem(SQLModel, table=True):
     user_id: Optional[int] = Field(default=None, foreign_key="users.id", index=True)
     track_id: int = Field(foreign_key="tracks.id")
     position: int = Field(default=0, index=True)
+    
+    # Dynamic crossfade override for this specific queue item
+    dynamic_crossfade_ms: Optional[int] = Field(default=None)  # Calculated optimal crossfade in ms
 
     added_at: datetime = Field(default_factory=now_utc)
 

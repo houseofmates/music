@@ -116,6 +116,10 @@ def _to_track_dict(track: Track) -> dict:
         "tags": [],
         "cover_art_url": track.cover_art_url,
         "lyrics": track.lyrics,
+        # Gap detection metadata for dynamic crossfade
+        "leading_silence_ms": track.leading_silence_ms,
+        "trailing_silence_ms": track.trailing_silence_ms,
+        "has_detected_gaps": track.has_detected_gaps,
     }
 
 
@@ -490,7 +494,7 @@ async def get_queue(
     session: Session = Depends(get_session),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Get current queue."""
+    """Get current queue with dynamic crossfade information."""
     stmt = select(QueueItem, Track).join(Track, QueueItem.track_id == Track.id)
     if current_user:
         stmt = stmt.where(QueueItem.user_id == current_user.id)
@@ -505,6 +509,7 @@ async def get_queue(
             "id": item.id,
             "track_id": track.id,
             "position": item.position,
+            "dynamic_crossfade_ms": item.dynamic_crossfade_ms,
             "track": _to_track_dict(track),
         })
 
@@ -517,7 +522,7 @@ async def add_to_queue(
     session: Session = Depends(get_session),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Add track to queue."""
+    """Add track to queue with dynamic crossfade calculation."""
     track_id = data.get("track_id")
     position = data.get("position")
     
@@ -528,8 +533,10 @@ async def add_to_queue(
     if not track:
         raise HTTPException(status_code=404, detail="Track not found")
     
-    # Get current queue items to determine position
-    stmt = select(QueueItem).where(QueueItem.user_id == (current_user.id if current_user else None))
+    # Get current queue items to determine position and calculate dynamic crossfade
+    stmt = select(QueueItem, Track).join(Track, QueueItem.track_id == Track.id).where(
+        QueueItem.user_id == (current_user.id if current_user else None)
+    ).order_by(QueueItem.position)
     existing_items = session.exec(stmt).all()
     
     if position is None:
@@ -545,16 +552,44 @@ async def add_to_queue(
         )
         session.exec(stmt)
     
+    # Calculate dynamic crossfade based on adjacent tracks
+    dynamic_crossfade_ms = None
+    from gap_detection import GapDetectionService
+    
+    # Get previous track's trailing silence
+    prev_trailing_silence = None
+    if position > 0 and position <= len(existing_items):
+        prev_track = existing_items[position - 1][1]  # Get Track from tuple
+        prev_trailing_silence = prev_track.trailing_silence_ms
+    
+    # Get next track's leading silence
+    next_leading_silence = None
+    if position < len(existing_items):
+        next_track = existing_items[position][1]  # Get Track from tuple (shifted by 1 due to insertion)
+        next_leading_silence = next_track.leading_silence_ms
+    
+    # Calculate optimal crossfade if we have silence data
+    if prev_trailing_silence or next_leading_silence:
+        dynamic_crossfade_ms = GapDetectionService.calculate_optimal_crossfade(
+            prev_trailing_silence,
+            next_leading_silence
+        )
+    
     queue_item = QueueItem(
         track_id=track_id,
         user_id=current_user.id if current_user else None,
-        position=position
+        position=position,
+        dynamic_crossfade_ms=dynamic_crossfade_ms
     )
     session.add(queue_item)
     session.commit()
     session.refresh(queue_item)
     
-    return {"id": queue_item.id, "position": queue_item.position}
+    return {
+        "id": queue_item.id,
+        "position": queue_item.position,
+        "dynamic_crossfade_ms": dynamic_crossfade_ms
+    }
 
 
 @router.delete("/queue/{queue_item_id}")
