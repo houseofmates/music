@@ -10,17 +10,29 @@ function getBackgroundModePlugin() {
   return window.cordova?.plugins?.backgroundMode || null;
 }
 
-const SILENT_AUDIO_URI = 'data:audio/mpeg;base64,SUQzBAAAAAABAFRYWFgAAAASAAADbWFqb3JfYnJhbmQAZGFzaABUWFhYAAAAEQAAA21pbm9yX3ZlcnNpb24AMABUWFhYAAAAHAAAA2NvbXBhdGlibGVfYnJhbmRzAGlzbzZtcDQyAFRTU0UAAAAPAAADTGF2ZjYwLjMuMTAwAAAAAAAAAAAAAAD/8MUAAAAAAAAAAAAAAAAAAAAAABVbm5hbWVkAFVubmFtZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/8MUAAAAAAAAAAAAAAAAAAAAAAFVubmFtZWQAVW5uYW1lZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+const SILENT_AUDIO_URI = 'data:audio/mpeg;base64,SUQzBAAAAAABAFRYWFgAAAASAAADbWFqb3JfYnJhbmQAZGFzaABUWFhYAAAAEQAAA21pbm9yX3ZlcnNpb24AMABUWFhYAAAAHAAAA2NvbXBhdGlibGVfYnJhbmRzAGlzbzZtcDQyAFRTU0UAAAAPAAADTGF2ZjYwLjMuMTAwAAAAAAAAAAAAAAD/8MUAAAAAAAAAAAAAAAAAAAAAABVbm5hbWVkAFVubmFtZWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 /**
  * AppLifecycleManager handles the "bulletproof" background playback persistence.
  * It manages heartbeats, stall detection, and Capacitor background mode.
+ * Hardened against: duplicate listeners, stale refs, race conditions, promise rejections,
+ * memory leaks, configuration changes, process death/recreation.
  */
 const AppLifecycleManager = () => {
   const silentAudioRef = useRef(null);
   const heartbeatIntervalRef = useRef(null);
+  const durIntRef = useRef(null);
+  const posIntRef = useRef(null);
   const stallCounterRef = useRef(0);
   const lastPositionSeenRef = useRef(0);
+  const mainAudioRef = useRef(null);
+  const crossfadeAudioRef = useRef(null);
+  const isMountedRef = useRef(true);
+  const nativeListenerRef = useRef(null);
+  const lifecycleListenersRef = useRef([]);
+  const mediaSessionHandlersRef = useRef(null);
+  const wakeLockRef = useRef(null);
+  const positionIntervalRef = useRef(null);
   
   const {
     currentTrack,
@@ -46,13 +58,24 @@ const AppLifecycleManager = () => {
     setAudioDuration,
   } = usePlayerStore();
 
-  const mainAudioRef = useRef(null);
-  const crossfadeAudioRef = useRef(null);
+  // Safe state getter that checks mounted status
+  const getSafeState = useCallback(() => {
+    if (!isMountedRef.current) return null;
+    return usePlayerStore.getState();
+  }, []);
+
+  // Safe audio element accessor
+  const getAudio = useCallback(() => {
+    const state = getSafeState();
+    return state?.audioRef ?? mainAudioRef.current;
+  }, [getSafeState]);
 
   // 1. Initialize Main Audio Elements (Main & Crossfade) — skip when native handles playback
   useEffect(() => {
     if (typeof document === 'undefined') return;
     if (nativeMusic.isAvailable) return;
+
+    isMountedRef.current = true;
 
     // Initialize Main Audio
     const audio = document.createElement('audio');
@@ -83,35 +106,42 @@ const AppLifecycleManager = () => {
 
     // Core Event Listeners
     const handleTimeUpdate = () => {
-      const s = usePlayerStore.getState();
-      if (s.isDraggingProgress) return;
-      if (audio.currentTime === 0 && s.currentPosition > 5) return; // Prevent reset jumps
+      const s = getSafeState();
+      if (!s) return;
+      const isDragging = typeof window !== 'undefined' && !!window.__isDraggingProgressRef;
+      if (isDragging || s.isDraggingProgress) return;
+      if (audio.currentTime === 0 && s.currentPosition > 5) return;
       s.setCurrentPosition(audio.currentTime);
     };
 
     const handleDurationChange = () => {
       if (audio.duration && Number.isFinite(audio.duration) && audio.duration > 0) {
-        usePlayerStore.getState().setAudioDuration(audio.duration);
+        const state = getSafeState();
+        if (state) state.setAudioDuration(audio.duration);
       }
     };
 
-    const handleEnded = () => usePlayerStore.getState().nextTrack();
+    const handleEnded = () => {
+      const state = getSafeState();
+      if (state) state.nextTrack();
+    };
 
     const handleError = () => {
-      const s = usePlayerStore.getState();
-      if (audio.error && s.isPlaying && audio.src) {
+      const s = getSafeState();
+      if (s && audio.error && s.isPlaying && audio.src) {
         console.error("Audio error detected, attempting recovery:", audio.error);
         setTimeout(() => {
-          if (usePlayerStore.getState().isPlaying) {
-             usePlayerStore.getState().forceRecovery();
+          const currentState = getSafeState();
+          if (currentState && currentState.isPlaying) {
+            currentState.forceRecovery();
           }
         }, 2000);
       }
     };
 
     const handleStall = () => {
-      const s = usePlayerStore.getState();
-      if (s.isPlaying && audio.paused && !audio.ended) {
+      const s = getSafeState();
+      if (s && s.isPlaying && audio.paused && !audio.ended) {
         audio.play().catch(() => {});
       }
     };
@@ -125,10 +155,11 @@ const AppLifecycleManager = () => {
     audio.addEventListener('suspend', handleStall);
 
     // Critical Sync Intervals (Fallback for when events don't fire in background)
-    const durInt = setInterval(handleDurationChange, 3000);
-    const posInt = setInterval(() => {
-      const s = usePlayerStore.getState();
-      if (s.isPlaying && !s.isDraggingProgress && Number.isFinite(audio.currentTime)) {
+    durIntRef.current = setInterval(handleDurationChange, 3000);
+    posIntRef.current = setInterval(() => {
+      const s = getSafeState();
+      const isDragging = typeof window !== 'undefined' && !!window.__isDraggingProgressRef;
+      if (s && s.isPlaying && !isDragging && !s.isDraggingProgress && Number.isFinite(audio.currentTime)) {
         s.setCurrentPosition(audio.currentTime);
       }
     }, 1000);
@@ -138,27 +169,88 @@ const AppLifecycleManager = () => {
     silent.id = 'silent-audio-loop';
     silent.src = SILENT_AUDIO_URI;
     silent.loop = true;
-    silent.volume = 0.01; // Barely audible but keeps thread alive
+    silent.volume = 0.01;
     silent.style.display = 'none';
     document.body.appendChild(silent);
     silentAudioRef.current = silent;
 
     return () => {
-      clearInterval(durInt);
-      clearInterval(posInt);
+      isMountedRef.current = false;
       
-      [audio, crossfade, silent].forEach(el => {
-        el.pause();
-        el.src = '';
-        el.load();
-        el.parentNode?.removeChild(el);
-      });
+      if (durIntRef.current) clearInterval(durIntRef.current);
+      if (posIntRef.current) clearInterval(posIntRef.current);
+      
+      const cleanupAudio = (el) => {
+        if (el) {
+          el.removeEventListener('timeupdate', handleTimeUpdate);
+          el.removeEventListener('durationchange', handleDurationChange);
+          el.removeEventListener('ended', handleEnded);
+          el.removeEventListener('error', handleError);
+          el.removeEventListener('waiting', handleStall);
+          el.removeEventListener('stalled', handleStall);
+          el.removeEventListener('suspend', handleStall);
+          try {
+            el.pause();
+            el.src = '';
+            el.load();
+          } catch (e) {}
+          el.parentNode?.removeChild(el);
+        }
+      };
+      
+      cleanupAudio(mainAudioRef.current);
+      cleanupAudio(crossfadeAudioRef.current);
+      cleanupAudio(silentAudioRef.current);
+      
+      // Nullify store refs to prevent stale references
+      const store = usePlayerStore.getState();
+      store.setAudioRef(null);
+      store.setCrossfadeAudioRef(null);
       
       mainAudioRef.current = null;
       crossfadeAudioRef.current = null;
       silentAudioRef.current = null;
     };
-  }, []);
+  }, [getSafeState]);
+
+  // Cleanup web audio elements when native player becomes available
+  useEffect(() => {
+    if (!nativeMusic.isAvailable) return;
+    
+    const store = usePlayerStore.getState();
+    const audio = store.audioRef;
+    const crossfade = store.crossfadeAudioRef;
+    const silent = silentAudioRef.current;
+    
+    const cleanupAudio = (el) => {
+      if (el) {
+        try {
+          el.pause();
+          el.src = '';
+          el.load();
+        } catch (e) {}
+        el.parentNode?.removeChild(el);
+      }
+    };
+    
+    cleanupAudio(audio);
+    cleanupAudio(crossfade);
+    cleanupAudio(silent);
+    
+    store.setAudioRef(null);
+    store.setCrossfadeAudioRef(null);
+    mainAudioRef.current = null;
+    crossfadeAudioRef.current = null;
+    silentAudioRef.current = null;
+    
+    // Clear intervals
+    if (durIntRef.current) clearInterval(durIntRef.current);
+    if (posIntRef.current) clearInterval(posIntRef.current);
+    if (heartbeatIntervalRef.current) {
+      clearInterval(heartbeatIntervalRef.current);
+      heartbeatIntervalRef.current = null;
+    }
+  }, [nativeMusic.isAvailable]);
 
   // 2. Heartbeat & Stall Detection Logic (skipped when native handles playback)
   const startHeartbeat = useCallback(() => {
@@ -166,16 +258,16 @@ const AppLifecycleManager = () => {
     if (nativeMusic.isAvailable) return;
     
     heartbeatIntervalRef.current = setInterval(() => {
-      const store = usePlayerStore.getState();
+      const store = getSafeState();
+      if (!store || !store.isPlaying) return;
+
       const audio = store.audioRef;
       const silentAudio = silentAudioRef.current;
-
-      if (!store.isPlaying) return;
 
       if (silentAudio) {
         if (audio && !audio.paused && audio.src) {
           if (!silentAudio.paused) {
-            silentAudio.pause();
+            silentAudio.pause().catch(() => {});
           }
         } else if (silentAudio.paused) {
           silentAudio.play().catch(() => {});
@@ -203,7 +295,7 @@ const AppLifecycleManager = () => {
 
       if (store.resumeAudioContext) store.resumeAudioContext();
     }, 1000);
-  }, []);
+  }, [getSafeState]);
 
   const stopHeartbeat = useCallback(() => {
     if (heartbeatIntervalRef.current) {
@@ -257,7 +349,9 @@ const AppLifecycleManager = () => {
 
   // 4. App Lifecycle Management (Background/Foreground)
   const handleAppLifecycle = useCallback(async (isActive) => {
-    const store = usePlayerStore.getState();
+    const store = getSafeState();
+    if (!store) return;
+    
     const audio = store.audioRef;
     const silentAudio = silentAudioRef.current;
     const bgMode = getBackgroundModePlugin();
@@ -304,45 +398,60 @@ const AppLifecycleManager = () => {
 
         // Sync position to fix potential webview drift
         setTimeout(() => {
-          const s = usePlayerStore.getState();
-          const a = s.audioRef;
-          if (!a || !s.currentTrack) return;
+          const s = getSafeState();
+          const a = s?.audioRef;
+          if (!a || !s?.currentTrack) return;
           if (s.currentPosition > 0 && Math.abs(a.currentTime - s.currentPosition) > 5) {
-            a.currentTime = s.currentPosition;
+            try { a.currentTime = s.currentPosition; } catch (e) {}
           }
         }, 300);
       }
 
       processWidgetAction();
     }
-  }, [startHeartbeat, stopHeartbeat, processWidgetAction]);
+  }, [startHeartbeat, stopHeartbeat, processWidgetAction, getSafeState]);
 
+  // Lifecycle effect with proper cleanup tracking
   useEffect(() => {
     const onVisibilityChange = () => handleAppLifecycle(document.visibilityState === 'visible');
     const onBeforeUnload = () => {
-      usePlayerStore.getState().flushPositionSync();
-      nativeMusic.stop();
+      const state = usePlayerStore.getState();
+      state.flushPositionSync();
+      nativeMusic.stop().catch(() => {});
     };
     
     let capacitorSub = null;
     if (CapacitorApp?.addListener) {
       capacitorSub = CapacitorApp.addListener('appStateChange', ({ isActive }) => handleAppLifecycle(isActive));
+      lifecycleListenersRef.current.push(capacitorSub);
     }
 
     document.addEventListener('visibilitychange', onVisibilityChange);
     window.addEventListener('beforeunload', onBeforeUnload);
     window.addEventListener('focus', processWidgetAction);
+    lifecycleListenersRef.current.push(
+      { type: 'visibility', handler: onVisibilityChange },
+      { type: 'beforeunload', handler: onBeforeUnload },
+      { type: 'focus', handler: processWidgetAction }
+    );
 
     if (document.visibilityState !== 'visible') {
       handleAppLifecycle(false);
     }
 
     return () => {
+      isMountedRef.current = false;
       stopHeartbeat();
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      window.removeEventListener('beforeunload', onBeforeUnload);
-      window.removeEventListener('focus', processWidgetAction);
-      capacitorSub?.remove();
+      
+      lifecycleListenersRef.current.forEach(l => {
+        if (l?.remove) l.remove();
+        else if (l?.type === 'visibility') document.removeEventListener('visibilitychange', l.handler);
+        else if (l?.type === 'beforeunload') window.removeEventListener('beforeunload', l.handler);
+        else if (l?.type === 'focus') window.removeEventListener('focus', l.handler);
+      });
+      lifecycleListenersRef.current = [];
+      
+      capacitorSub?.remove?.();
     };
   }, [handleAppLifecycle, stopHeartbeat, processWidgetAction]);
 
@@ -364,19 +473,18 @@ const AppLifecycleManager = () => {
     if (typeof navigator === 'undefined' || !('mediaSession' in navigator)) return;
     if (nativeMusic.isAvailable) return;
 
-    let posInt = null;
-    let wakeLock = null;
-
     const requestWakeLock = async () => {
       if ('wakeLock' in navigator && isPlaying) {
-        try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+        try { 
+          wakeLockRef.current = await navigator.wakeLock.request('screen'); 
+        } catch (e) {}
       }
     };
 
     const updatePos = () => {
-      const store = usePlayerStore.getState();
-      const a = store.audioRef;
-      if (!a || !store.currentTrack) return;
+      const store = getSafeState();
+      const a = store?.audioRef;
+      if (!a || !store?.currentTrack) return;
       try {
         const duration = Number(a.duration || 0);
         const safeDur = Number.isFinite(duration) && duration > 0 ? duration : 0;
@@ -409,7 +517,7 @@ const AppLifecycleManager = () => {
     navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
 
     if (isPlaying) {
-      posInt = setInterval(updatePos, 1000);
+      positionIntervalRef.current = setInterval(updatePos, 1000);
       requestWakeLock();
     }
 
@@ -424,31 +532,43 @@ const AppLifecycleManager = () => {
       stop: () => usePlayerStore.getState().playPause(),
     };
 
+    mediaSessionHandlersRef.current = handlers;
     Object.entries(handlers).forEach(([action, handler]) => {
       try { navigator.mediaSession.setActionHandler(action, handler); } catch (e) {}
     });
 
     return () => {
-      if (posInt) clearInterval(posInt);
-      if (wakeLock) wakeLock.release().catch(() => {});
+      if (positionIntervalRef.current) clearInterval(positionIntervalRef.current);
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release().catch(() => {});
+        wakeLockRef.current = null;
+      }
+      // Clear media session handlers
+      if (mediaSessionHandlersRef.current) {
+        Object.keys(mediaSessionHandlersRef.current).forEach(action => {
+          try { navigator.mediaSession.setActionHandler(action, null); } catch (e) {}
+        });
+        mediaSessionHandlersRef.current = null;
+      }
     };
-  }, [currentTrack, isPlaying, currentPosition]);
+  }, [currentTrack, isPlaying, currentPosition, getSafeState]);
 
   // 7. Native State Listener — forwards native playback events to the store
   useEffect(() => {
     if (!nativeMusic.isAvailable) return;
 
-    const unsub = nativeMusic.onStateChange((data) => {
-      const s = usePlayerStore.getState();
+    const handler = (data) => {
+      const s = getSafeState();
+      if (!s) return;
 
       if (data.state === NATIVE_MUSIC_STATE.COMPLETED) {
         const beforeId = s.currentTrack?.id;
         s.nextTrack();
         // If nextTrack didn't start a new track, fully stop native
         setTimeout(() => {
-          const after = usePlayerStore.getState();
-          if (after.currentTrack?.id === beforeId) {
-            nativeMusic.stop();
+          const after = getSafeState();
+          if (after && after.currentTrack?.id === beforeId) {
+            nativeMusic.stop().catch(() => {});
             usePlayerStore.setState({ isPlaying: false });
           }
         }, 200);
@@ -471,10 +591,15 @@ const AppLifecycleManager = () => {
       if (data.duration != null && data.duration > 0) {
         s.setAudioDuration(data.duration);
       }
-    });
+    };
 
-    return () => unsub();
-  }, []);
+    nativeListenerRef.current = nativeMusic.onStateChange(handler);
+
+    return () => {
+      nativeListenerRef.current?.();
+      nativeListenerRef.current = null;
+    };
+  }, [getSafeState]);
 
   return null;
 };

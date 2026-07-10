@@ -2,6 +2,8 @@ package com.house.music;
 
 import android.os.Build;
 import android.content.Intent;
+import android.content.Context;
+import androidx.core.content.ContextCompat;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -48,9 +50,21 @@ public class MusicPlugin extends Plugin {
             return;
         }
 
+        // Reject blob URLs - they cannot be played by MediaPlayer
+        if (url.startsWith("blob:")) {
+            call.reject("blob URLs not supported by native player; use HTTP stream URL");
+            return;
+        }
+
         JSObject track = call.getObject("track", new JSObject());
 
-        Intent intent = new Intent(getActivity(), MusicService.class);
+        Context context = getContext();
+        if (context == null) {
+            call.reject("context unavailable");
+            return;
+        }
+
+        Intent intent = new Intent(context, MusicService.class);
         intent.setAction(MusicService.ACTION_PLAY_URL);
         intent.putExtra(MusicService.EXTRA_URL, url);
         intent.putExtra(MusicService.EXTRA_TRACK_ID, track.optString("id", ""));
@@ -59,13 +73,16 @@ public class MusicPlugin extends Plugin {
         intent.putExtra(MusicService.EXTRA_ALBUM, track.optString("album", ""));
         intent.putExtra(MusicService.EXTRA_DURATION, track.optInt("duration", 0));
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            getActivity().startForegroundService(intent);
-        } else {
-            getActivity().startService(intent);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                ContextCompat.startForegroundService(context, intent);
+            } else {
+                context.startService(intent);
+            }
+            call.resolve();
+        } catch (Exception e) {
+            call.reject("failed to start playback: " + e.getMessage());
         }
-
-        call.resolve();
     }
 
     @PluginMethod
@@ -85,10 +102,16 @@ public class MusicPlugin extends Plugin {
         Double seconds = call.getDouble("position", 0.0);
         int ms = (int) (seconds * 1000);
 
-        Intent intent = new Intent(getActivity(), MusicService.class);
+        Context context = getContext();
+        if (context == null) {
+            call.reject("context unavailable");
+            return;
+        }
+
+        Intent intent = new Intent(context, MusicService.class);
         intent.setAction(MusicService.ACTION_SEEK_TO);
         intent.putExtra(MusicService.EXTRA_POSITION, ms);
-        getActivity().startService(intent);
+        context.startService(intent);
         call.resolve();
     }
 
@@ -109,8 +132,11 @@ public class MusicPlugin extends Plugin {
     }
 
     private void sendAction(String action) {
-        Intent intent = new Intent(getActivity(), MusicService.class);
+        Context context = getContext();
+        if (context == null) return;
+
+        Intent intent = new Intent(context, MusicService.class);
         intent.setAction(action);
-        getActivity().startService(intent);
+        context.startService(intent);
     }
 }

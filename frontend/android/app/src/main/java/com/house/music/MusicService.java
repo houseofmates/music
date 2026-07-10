@@ -80,10 +80,12 @@ public class MusicService extends Service
     private String currentAlbum = "";
     private int currentDurationMs = 0;
     private boolean isPreparing = false;
+    private boolean isServiceStarted = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        // Ensure notification channel exists before any startForeground call
         createNotificationChannel();
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         initMediaSession();
@@ -94,6 +96,12 @@ public class MusicService extends Service
         if (intent == null || intent.getAction() == null) {
             return START_STICKY;
         }
+        
+        // Prevent multiple simultaneous start commands
+        if (!isServiceStarted) {
+            isServiceStarted = true;
+        }
+        
         handleAction(intent);
         return START_STICKY;
     }
@@ -102,110 +110,162 @@ public class MusicService extends Service
         String action = intent.getAction();
         if (action == null) return;
 
-        switch (action) {
-            case ACTION_PLAY_URL:
-                String url = intent.getStringExtra(EXTRA_URL);
-                if (url != null) {
-                    currentTrackId = intent.getStringExtra(EXTRA_TRACK_ID);
-                    currentTitle   = intent.getStringExtra(EXTRA_TITLE);
-                    currentArtist  = intent.getStringExtra(EXTRA_ARTIST);
-                    currentAlbum   = intent.getStringExtra(EXTRA_ALBUM);
-                    currentDurationMs = intent.getIntExtra(EXTRA_DURATION, 0);
-                    playUrl(url);
-                }
-                break;
-            case ACTION_PAUSE:
-                pause();
-                break;
-            case ACTION_RESUME:
-                resume();
-                break;
-            case ACTION_SEEK_TO:
-                long pos = intent.getLongExtra(EXTRA_POSITION, 0);
-                seekTo((int) pos);
-                break;
-            case ACTION_STOP:
-                stopPlayback();
-                stopForeground(true);
-                stopSelf();
-                break;
+        try {
+            switch (action) {
+                case ACTION_PLAY_URL:
+                    String url = intent.getStringExtra(EXTRA_URL);
+                    if (url != null) {
+                        currentTrackId = intent.getStringExtra(EXTRA_TRACK_ID);
+                        currentTitle   = intent.getStringExtra(EXTRA_TITLE) != null ? intent.getStringExtra(EXTRA_TITLE) : "";
+                        currentArtist  = intent.getStringExtra(EXTRA_ARTIST) != null ? intent.getStringExtra(EXTRA_ARTIST) : "";
+                        currentAlbum   = intent.getStringExtra(EXTRA_ALBUM) != null ? intent.getStringExtra(EXTRA_ALBUM) : "";
+                        currentDurationMs = intent.getIntExtra(EXTRA_DURATION, 0);
+                        playUrl(url);
+                    }
+                    break;
+                case ACTION_PAUSE:
+                    pause();
+                    break;
+                case ACTION_RESUME:
+                    resume();
+                    break;
+                case ACTION_SEEK_TO:
+                    long pos = intent.getLongExtra(EXTRA_POSITION, 0);
+                    seekTo((int) pos);
+                    break;
+                case ACTION_STOP:
+                    stopPlayback();
+                    stopForeground(true);
+                    stopSelf();
+                    isServiceStarted = false;
+                    break;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error handling action: " + action, e);
+            notifyState(STATE_ERROR, 0);
         }
     }
 
     private void playUrl(String url) {
         if (url == null) return;
-        currentUrl = url;
+        
+        // Validate URL scheme
+        if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("file://")) {
+            Log.e(TAG, "Invalid URL scheme: " + url);
+            notifyState(STATE_ERROR, 0);
+            return;
+        }
 
+        currentUrl = url;
         releaseMediaPlayer();
 
-        mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build());
-        mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-        mediaPlayer.setOnPreparedListener(this);
-        mediaPlayer.setOnCompletionListener(this);
-        mediaPlayer.setOnErrorListener(this);
-        mediaPlayer.setOnInfoListener(this);
-
         try {
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioAttributes(new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_MEDIA)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build());
+            mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+            mediaPlayer.setOnPreparedListener(this);
+            mediaPlayer.setOnCompletionListener(this);
+            mediaPlayer.setOnErrorListener(this);
+            mediaPlayer.setOnInfoListener(this);
+
             mediaPlayer.setDataSource(url);
             isPreparing = true;
             mediaPlayer.prepareAsync();
 
             requestAudioFocus();
+            // Notification channel guaranteed to exist from onCreate()
             startForeground(NOTIFICATION_ID, buildNotification(false));
             updateMediaSessionState();
         } catch (IOException e) {
             Log.e(TAG, "setDataSource failed: " + e.getMessage());
             notifyState(STATE_ERROR, 0);
+            releaseMediaPlayer();
+        } catch (IllegalArgumentException | SecurityException | IllegalStateException e) {
+            Log.e(TAG, "MediaPlayer setup failed: " + e.getMessage());
+            notifyState(STATE_ERROR, 0);
+            releaseMediaPlayer();
         }
     }
 
     private void pause() {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            currentState = STATE_PAUSED;
-            updateNotification(false);
-            updateMediaSessionState();
-            notifyState(STATE_PAUSED, mediaPlayer.getCurrentPosition());
+            try {
+                mediaPlayer.pause();
+                currentState = STATE_PAUSED;
+                updateNotification(false);
+                updateMediaSessionState();
+                notifyState(STATE_PAUSED, mediaPlayer.getCurrentPosition());
+            } catch (IllegalStateException e) {
+                Log.w(TAG, "Pause failed: " + e.getMessage());
+            }
         }
     }
 
     private void resume() {
         if (mediaPlayer != null && !mediaPlayer.isPlaying() && !isPreparing) {
-            requestAudioFocus();
-            mediaPlayer.start();
-            currentState = STATE_PLAYING;
-            updateNotification(true);
-            updateMediaSessionState();
-            notifyState(STATE_PLAYING, mediaPlayer.getCurrentPosition());
+            try {
+                requestAudioFocus();
+                mediaPlayer.start();
+                currentState = STATE_PLAYING;
+                updateNotification(true);
+                updateMediaSessionState();
+                notifyState(STATE_PLAYING, mediaPlayer.getCurrentPosition());
+            } catch (IllegalStateException e) {
+                Log.w(TAG, "Resume failed: " + e.getMessage());
+            }
         }
     }
 
     private void seekTo(int positionMs) {
         if (mediaPlayer != null) {
-            mediaPlayer.seekTo(positionMs);
+            try {
+                // Clamp position to valid range
+                int duration = mediaPlayer.getDuration();
+                if (duration > 0) {
+                    positionMs = Math.max(0, Math.min(positionMs, duration));
+                }
+                mediaPlayer.seekTo(positionMs);
+            } catch (IllegalStateException e) {
+                Log.w(TAG, "Seek failed: " + e.getMessage());
+            }
         }
     }
 
     public int getCurrentPosition() {
         if (mediaPlayer != null && !isPreparing) {
-            return mediaPlayer.getCurrentPosition();
+            try {
+                return mediaPlayer.getCurrentPosition();
+            } catch (IllegalStateException e) {
+                return 0;
+            }
         }
         return 0;
     }
 
     public int getDuration() {
         if (mediaPlayer != null && !isPreparing) {
-            return mediaPlayer.getDuration();
+            try {
+                int dur = mediaPlayer.getDuration();
+                return dur > 0 ? dur : currentDurationMs;
+            } catch (IllegalStateException e) {
+                return currentDurationMs;
+            }
         }
         return currentDurationMs;
     }
 
     public boolean isPlaying() {
-        return mediaPlayer != null && mediaPlayer.isPlaying();
+        if (mediaPlayer != null) {
+            try {
+                return mediaPlayer.isPlaying();
+            } catch (IllegalStateException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
     private void stopPlayback() {
@@ -224,39 +284,63 @@ public class MusicService extends Service
             } catch (Exception e) {
                 Log.e(TAG, "Error releasing MediaPlayer: " + e.getMessage());
             }
-            mediaPlayer.release();
+            try {
+                mediaPlayer.release();
+            } catch (Exception e) {
+                Log.e(TAG, "Error in mediaPlayer.release(): " + e.getMessage());
+            }
             mediaPlayer = null;
         }
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+        if (mediaPlayer != mp) return; // Stale callback
+        
         isPreparing = false;
-        mp.start();
-        currentState = STATE_PLAYING;
-        currentDurationMs = mp.getDuration();
-        updateNotification(true);
-        updateMediaSessionState();
-        notifyState(STATE_PLAYING, 0);
+        try {
+            mp.start();
+            currentState = STATE_PLAYING;
+            currentDurationMs = mp.getDuration();
+            updateNotification(true);
+            updateMediaSessionState();
+            notifyState(STATE_PLAYING, 0);
+        } catch (IllegalStateException e) {
+            Log.e(TAG, "Start after prepare failed: " + e.getMessage());
+            notifyState(STATE_ERROR, 0);
+        }
     }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+        if (mediaPlayer != mp) return; // Stale callback
+        
         currentState = STATE_COMPLETED;
         notifyState(STATE_COMPLETED, getDuration());
     }
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
+        if (mediaPlayer != mp) return true; // Stale callback
+        
         Log.e(TAG, "MediaPlayer error: what=" + what + " extra=" + extra);
         currentState = STATE_ERROR;
         isPreparing = false;
         notifyState(STATE_ERROR, 0);
+        releaseMediaPlayer();
         return true;
     }
 
     @Override
     public boolean onInfo(MediaPlayer mp, int what, int extra) {
+        if (mediaPlayer != mp) return false;
+        
+        // Handle buffering info
+        if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START) {
+            // Could notify buffering state
+        } else if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
+            // Buffering ended
+        }
         return false;
     }
 
@@ -270,16 +354,30 @@ public class MusicService extends Service
                 pause();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                if (mediaPlayer != null) mediaPlayer.setVolume(0.3f, 0.3f);
+                if (mediaPlayer != null) {
+                    try {
+                        mediaPlayer.setVolume(0.3f, 0.3f);
+                    } catch (IllegalStateException e) {
+                        // Ignore
+                    }
+                }
                 break;
             case AudioManager.AUDIOFOCUS_GAIN:
-                if (mediaPlayer != null) mediaPlayer.setVolume(1.0f, 1.0f);
+                if (mediaPlayer != null) {
+                    try {
+                        mediaPlayer.setVolume(1.0f, 1.0f);
+                    } catch (IllegalStateException e) {
+                        // Ignore
+                    }
+                }
                 resume();
                 break;
         }
     }
 
     private void requestAudioFocus() {
+        if (audioManager == null) return;
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             AudioAttributes attrs = new AudioAttributes.Builder()
                     .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -296,11 +394,22 @@ public class MusicService extends Service
     }
 
     private void abandonAudioFocus() {
+        if (audioManager == null) return;
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && audioFocusRequest != null) {
-            audioManager.abandonAudioFocusRequest(audioFocusRequest);
+            try {
+                audioManager.abandonAudioFocusRequest(audioFocusRequest);
+            } catch (Exception e) {
+                Log.w(TAG, "Abandon audio focus failed: " + e.getMessage());
+            }
         } else {
-            audioManager.abandonAudioFocus(this);
+            try {
+                audioManager.abandonAudioFocus(this);
+            } catch (Exception e) {
+                Log.w(TAG, "Abandon audio focus (legacy) failed: " + e.getMessage());
+            }
         }
+        audioFocusRequest = null;
     }
 
     private void initMediaSession() {
@@ -333,12 +442,16 @@ public class MusicService extends Service
         long pos = 0;
 
         if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                pbState = PlaybackState.STATE_PLAYING;
-                pos = mediaPlayer.getCurrentPosition();
-            } else if (currentState == STATE_PAUSED) {
-                pbState = PlaybackState.STATE_PAUSED;
-                pos = mediaPlayer.getCurrentPosition();
+            try {
+                if (mediaPlayer.isPlaying()) {
+                    pbState = PlaybackState.STATE_PLAYING;
+                    pos = mediaPlayer.getCurrentPosition();
+                } else if (currentState == STATE_PAUSED) {
+                    pbState = PlaybackState.STATE_PAUSED;
+                    pos = mediaPlayer.getCurrentPosition();
+                }
+            } catch (IllegalStateException e) {
+                // MediaPlayer in invalid state
             }
         }
 
@@ -358,9 +471,12 @@ public class MusicService extends Service
         mediaSession.setPlaybackState(builder.build());
 
         android.media.MediaMetadata.Builder metaBuilder = new android.media.MediaMetadata.Builder();
-        if (currentTitle != null)  metaBuilder.putString(android.media.MediaMetadata.METADATA_KEY_TITLE, currentTitle);
-        if (currentArtist != null) metaBuilder.putString(android.media.MediaMetadata.METADATA_KEY_ARTIST, currentArtist);
-        if (currentAlbum != null)  metaBuilder.putString(android.media.MediaMetadata.METADATA_KEY_ALBUM, currentAlbum);
+        if (currentTitle != null && !currentTitle.isEmpty())  
+            metaBuilder.putString(android.media.MediaMetadata.METADATA_KEY_TITLE, currentTitle);
+        if (currentArtist != null && !currentArtist.isEmpty()) 
+            metaBuilder.putString(android.media.MediaMetadata.METADATA_KEY_ARTIST, currentArtist);
+        if (currentAlbum != null && !currentAlbum.isEmpty())  
+            metaBuilder.putString(android.media.MediaMetadata.METADATA_KEY_ALBUM, currentAlbum);
         metaBuilder.putLong(android.media.MediaMetadata.METADATA_KEY_DURATION, getDuration());
         mediaSession.setMetadata(metaBuilder.build());
     }
@@ -416,7 +532,9 @@ public class MusicService extends Service
 
     private void updateNotification(boolean isPlaying) {
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(NOTIFICATION_ID, buildNotification(isPlaying));
+        if (nm != null) {
+            nm.notify(NOTIFICATION_ID, buildNotification(isPlaying));
+        }
     }
 
     private void createNotificationChannel() {
@@ -426,7 +544,9 @@ public class MusicService extends Service
             channel.setDescription("Notification for music playback controls");
             channel.setShowBadge(false);
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            nm.createNotificationChannel(channel);
+            if (nm != null) {
+                nm.createNotificationChannel(channel);
+            }
         }
     }
 
@@ -447,6 +567,7 @@ public class MusicService extends Service
         stopPlayback();
         stopForeground(true);
         stopSelf();
+        isServiceStarted = false;
     }
 
     @Override
@@ -454,11 +575,19 @@ public class MusicService extends Service
         stopForeground(true);
         stopPlayback();
         stateListener = null;
+        isServiceStarted = false;
+        
         if (mediaSession != null) {
-            mediaSession.setActive(false);
-            mediaSession.release();
+            try {
+                mediaSession.setActive(false);
+                mediaSession.release();
+            } catch (Exception e) {
+                Log.w(TAG, "MediaSession release failed: " + e.getMessage());
+            }
             mediaSession = null;
         }
+        
+        abandonAudioFocus();
         super.onDestroy();
     }
 }

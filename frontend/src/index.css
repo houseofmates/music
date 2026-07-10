@@ -548,6 +548,16 @@ button.player-play-btn {
   will-change: transform;
 }
 
+/* Disable CSS transitions on progress elements during dragging for 60fps smoothness */
+.progress-dragging *,
+.progress-dragging input[type="range"]::-webkit-slider-thumb,
+.progress-dragging input[type="range"]::-moz-range-thumb,
+.progress-dragging .progress-fill,
+.progress-dragging .progress-thumb {
+  transition: none !important;
+  animation: none !important;
+}
+
 /* Range thumb improvements */
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;

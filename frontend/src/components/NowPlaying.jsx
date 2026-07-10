@@ -21,6 +21,7 @@ import LyricsPanel from "./LyricsPanel";
 import EnhancedMetadataPanel from "./EnhancedMetadataPanel";
 import { resolveMediaUrl } from "../api.js";
 import { triggerImpact } from "../utils/haptics";
+import { useProgressDrag, useProgressClick } from "../hooks/useProgressDrag";
 
 function AudioVisualizer({ audio, isPlaying }) {
   const canvasRef = useRef(null);
@@ -186,14 +187,6 @@ export default function NowPlaying({ onClose }) {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const volumeRef = useRef(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const progressRef = useRef(null);
-
-  // Fall back to track metadata duration when the audio element hasn't
-  // reported its duration yet (common in Android WebView / Electron).
-  const duration = audioDuration || currentTrack?.duration || 0;
-
-  const isFavorite = favorites.some(f => f.id === currentTrack?.id);
   const [localVolume, setLocalVolume] = useState(volume || 0.8);
 
   useEffect(() => {
@@ -239,55 +232,47 @@ export default function NowPlaying({ onClose }) {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleProgressClick = (e) => {
-    if (!progressRef.current || !duration) return;
-    const rect = progressRef.current.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    seekTo(percent * duration);
-  };
+  const duration = audioDuration || currentTrack?.duration || 0;
 
-  const handleProgressMouseDown = (e) => {
-    e.stopPropagation();
-    if (!progressRef.current || !duration) return;
-    setIsDragging(true);
-    const rect = progressRef.current.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    seekTo(percent * duration);
-  };
+  const progressBarRef = useRef(null);
+  const fillRef = useRef(null);
+  const thumbRef = useRef(null);
 
-  const handleProgressMouseMove = (e) => {
-    if (!isDragging || !progressRef.current || !duration) return;
-    const rect = progressRef.current.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    seekTo(percent * duration);
-  };
+  const {
+    handleDragStart,
+    handleDragMove,
+    handleDragEnd,
+    attachMouseEvents,
+    attachTouchEvents,
+    isDraggingRef,
+    pendingSeekRef,
+    currentPositionRef,
+    durationRef,
+    updateVisuals,
+  } = useProgressDrag({
+    getDuration: () => duration,
+    getCurrentPosition: () => currentPosition,
+    onSeek: seekTo,
+    progressBarRef,
+    fillRef,
+    thumbRef,
+  });
 
-  const handleProgressMouseUp = () => {
-    setIsDragging(false);
-  };
-  const handleProgressTouchStart = (e) => {
-    e.stopPropagation();
-    if (!progressRef.current || !duration) return;
-    setIsDragging(true);
-    const touch = e.touches[0];
-    const rect = progressRef.current.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
-    seekTo(percent * duration);
-  };
+  const handleProgressClick = useProgressClick({
+    getDuration: () => duration,
+    getCurrentPosition: () => currentPosition,
+    onSeek: seekTo,
+    progressBarRef,
+  });
 
-  const handleProgressTouchMove = (e) => {
-    if (!isDragging || !progressRef.current || !duration) return;
-    e.preventDefault();
-    const touch = e.touches[0];
-    const rect = progressRef.current.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
-    seekTo(percent * duration);
-  };
-
-  const handleProgressTouchEnd = () => {
-    setIsDragging(false);
-  };
-
+  useEffect(() => {
+    const cleanupMouse = attachMouseEvents(progressBarRef.current);
+    const cleanupTouch = attachTouchEvents(progressBarRef.current);
+    return () => {
+      cleanupMouse();
+      cleanupTouch();
+    };
+  }, [attachMouseEvents, attachTouchEvents]);
 
   const handleVolumeChange = (e) => {
     e.stopPropagation();
@@ -304,16 +289,7 @@ export default function NowPlaying({ onClose }) {
 
   const isMuted = audioRef?.muted || localVolume === 0;
 
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener("mousemove", handleProgressMouseMove);
-      document.addEventListener("mouseup", handleProgressMouseUp);
-    }
-    return () => {
-      document.removeEventListener("mousemove", handleProgressMouseMove);
-      document.removeEventListener("mouseup", handleProgressMouseUp);
-    };
-  }, [isDragging]);
+  const isFavorite = favorites.some(f => f.id === currentTrack?.id);
 
   if (!currentTrack) return null;
 
@@ -503,25 +479,23 @@ export default function NowPlaying({ onClose }) {
 
         {/* progress bar row */}
         <div 
+          ref={progressBarRef}
           className="flex items-center gap-2 w-full max-w-[280px] select-none shrink-0"
-          onMouseDown={handleProgressMouseDown}
-          onMouseMove={isDragging ? handleProgressMouseMove : undefined}
-          onMouseUp={handleProgressMouseUp}
-          onTouchStart={handleProgressTouchStart}
-          onTouchMove={isDragging ? handleProgressTouchMove : undefined}
-          onTouchEnd={handleProgressTouchEnd}
         >
           <span className="text-xs text-white/60 w-10 text-right">{formatTime(currentPosition)}</span>
           <div 
-            ref={progressRef}
-            className={`flex-1 h-1.5 bg-[#222] rounded-full relative overflow-hidden ${isDragging ? "cursor-grabbing" : "cursor-pointer"}`}
+            className={`flex-1 h-1.5 bg-[#222] rounded-full relative overflow-hidden cursor-pointer`}
             onClick={handleProgressClick}
+            onMouseDown={(e) => handleDragStart(e.clientX)}
+            onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
           >
             <div 
-              className="absolute left-0 top-0 bottom-0 bg-[#f6b012] rounded-full transition-all duration-100"
-              style={{ 
-                width: `${duration ? (currentPosition / duration) * 100 : 0}%`
-              }}
+              ref={fillRef}
+              className="absolute left-0 top-0 bottom-0 bg-[#f6b012] rounded-full"
+            />
+            <div 
+              ref={thumbRef}
+              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
             />
           </div>
           <span className="text-xs text-white/60 w-10">{formatTime(duration)}</span>

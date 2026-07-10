@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Home, Music, Heart, Clock, ListMusic, WifiOff, Zap, PlayCircle,
   User, Disc3, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat,
@@ -10,86 +10,79 @@ import { resolveMediaUrl } from '../api';
 import { triggerImpact } from '../utils/haptics';
 import { useDataSaver } from '../context/DataSaverContext';
 import AudioProcessingModal from './AudioProcessingModal';
+import { useProgressDrag, useProgressClick } from '../hooks/useProgressDrag';
 
 export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
- const location = useLocation();
- const navigate = useNavigate();
- const dataSaver = useDataSaver();
- const volumeContainerRef = useRef(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const dataSaver = useDataSaver();
+  const volumeContainerRef = useRef(null);
   const volumeSliderRef = useRef(null);
 
- const {
- settings,
- currentTrack,
- isPlaying,
- currentPosition,
- audioDuration,
- repeatMode,
- shuffle,
- showQueue,
- showLyrics,
- volume,
- toggleOfflineMode,
- toggleLowPowerMode,
- playPause,
- nextTrack,
- previousTrack,
- jump,
- seekTo,
- setRepeatMode,
- toggleShuffle,
- toggleLyrics,
- toggleQueue,
- setVolume,
- } = usePlayerStore((state) => ({
- settings: state.settings,
- currentTrack: state.currentTrack,
- isPlaying: state.isPlaying,
- currentPosition: state.currentPosition,
- audioDuration: state.audioDuration,
- repeatMode: state.repeatMode,
- shuffle: state.shuffle,
- showQueue: state.showQueue,
- showLyrics: state.showLyrics,
- volume: state.volume,
- toggleOfflineMode: state.toggleOfflineMode,
- toggleLowPowerMode: state.toggleLowPowerMode,
- setVolume: state.setVolume,
- playPause: state.playPause,
- nextTrack: state.nextTrack,
- previousTrack: state.previousTrack,
- jump: state.jump,
- seekTo: state.seekTo,
- setRepeatMode: state.setRepeatMode,
- toggleShuffle: state.toggleShuffle,
- toggleLyrics: state.toggleLyrics,
- toggleQueue: state.toggleQueue,
- }));
+  const {
+  settings,
+  currentTrack,
+  isPlaying,
+  currentPosition,
+  audioDuration,
+  repeatMode,
+  shuffle,
+  showQueue,
+  showLyrics,
+  volume,
+  toggleOfflineMode,
+  toggleLowPowerMode,
+  playPause,
+  nextTrack,
+  previousTrack,
+  jump,
+  seekTo,
+  setRepeatMode,
+  toggleShuffle,
+  toggleLyrics,
+  toggleQueue,
+  setVolume,
+  } = usePlayerStore((state) => ({
+  settings: state.settings,
+  currentTrack: state.currentTrack,
+  isPlaying: state.isPlaying,
+  currentPosition: state.currentPosition,
+  audioDuration: state.audioDuration,
+  repeatMode: state.repeatMode,
+  shuffle: state.shuffle,
+  showQueue: state.showQueue,
+  showLyrics: state.showLyrics,
+  volume: state.volume,
+  toggleOfflineMode: state.toggleOfflineMode,
+  toggleLowPowerMode: state.toggleLowPowerMode,
+  setVolume: state.setVolume,
+  playPause: state.playPause,
+  nextTrack: state.nextTrack,
+  previousTrack: state.previousTrack,
+  jump: state.jump,
+  seekTo: state.seekTo,
+  setRepeatMode: state.setRepeatMode,
+  toggleShuffle: state.toggleShuffle,
+  toggleLyrics: state.toggleLyrics,
+  toggleQueue: state.toggleQueue,
+  }));
 
- const [pendingAction, setPendingAction] = useState(null);
- const [touchStartY, setTouchStartY] = useState(null);
-  const [isDraggingProgress, setIsDraggingProgress] = useState(false);
-  const [pendingSeek, setPendingSeek] = useState(null);
-   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
-   const [isMuted, setIsMuted] = useState(false);
-   const [isVolumeDragging, setIsVolumeDragging] = useState(false);
-   const [isDraggingMobileProgress, setIsDraggingMobileProgress] = useState(false);
-   const [showAudioProcessing, setShowAudioProcessing] = useState(false);
-   const [audioProcessingSettings, setAudioProcessingSettings] = useState({});
-  const mobileProgressRef = useRef(null);
+  const [pendingAction, setPendingAction] = useState(null);
+  const [touchStartY, setTouchStartY] = useState(null);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showAudioProcessing, setShowAudioProcessing] = useState(false);
+  const [audioProcessingSettings, setAudioProcessingSettings] = useState({});
 
-  
-   const handleVolumeChange = (e) => {
-     const newVolume = parseFloat(e.target.value);
-     setVolume(newVolume);
-   };
-
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+  };
 
   const offlineActive = Boolean(settings?.offlineMode);
   const lowPowerActive = Boolean(settings?.lowPowerMode);
 
   const duration = audioDuration || currentTrack?.duration || 0;
-  const progressPercent = duration > 0 ? (currentPosition / duration) * 100 : 0;
 
   const handleToggle = async (type) => {
     try {
@@ -101,65 +94,83 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     }
   };
 
-  const handleProgressChange = (e) => {
-    const val = parseFloat(e.target.value);
-    const bounded = Math.max(0, Math.min(duration || val, val));
-    setPendingSeek(bounded);
-    usePlayerStore.getState().setCurrentPosition(bounded);
-  };
+  const desktopProgressBarRef = useRef(null);
+  const desktopFillRef = useRef(null);
+  const desktopThumbRef = useRef(null);
 
-  const handleProgressEnd = () => {
-    setIsDraggingProgress(false);
-    usePlayerStore.getState().setIsDraggingProgress(false);
-    const target = pendingSeek ?? currentPosition;
-    if (Number.isFinite(target)) seekTo(target);
-    setPendingSeek(null);
-  };
+  const {
+    handleDragStart: handleDesktopDragStart,
+    handleDragMove: handleDesktopDragMove,
+    handleDragEnd: handleDesktopDragEnd,
+    attachMouseEvents: attachDesktopMouseEvents,
+    attachTouchEvents: attachDesktopTouchEvents,
+    isDraggingRef: isDesktopDraggingRef,
+    updateVisuals: updateDesktopVisuals,
+  } = useProgressDrag({
+    getDuration: () => duration,
+    getCurrentPosition: () => currentPosition,
+    onSeek: seekTo,
+    progressBarRef: desktopProgressBarRef,
+    fillRef: desktopFillRef,
+    thumbRef: desktopThumbRef,
+  });
 
-  const handleProgressClick = (e) => {
-    if (!duration) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    const newPosition = percent * duration;
-    seekTo(newPosition);
-  };
+  const handleDesktopClick = useProgressClick({
+    getDuration: () => duration,
+    getCurrentPosition: () => currentPosition,
+    onSeek: seekTo,
+    progressBarRef: desktopProgressBarRef,
+  });
 
-  const handleProgressTouch = (e) => {
-    if (!duration) return;
-    const touch = e.touches[0];
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
-    const newPosition = percent * duration;
-    seekTo(newPosition);
-  };
+  useEffect(() => {
+    if (desktopProgressBarRef.current) {
+      const cleanupMouse = attachDesktopMouseEvents(desktopProgressBarRef.current);
+      const cleanupTouch = attachDesktopTouchEvents(desktopProgressBarRef.current);
+      return () => {
+        cleanupMouse();
+        cleanupTouch();
+      };
+    }
+  }, [attachDesktopMouseEvents, attachDesktopTouchEvents]);
 
-  // Mobile progress bar drag handlers
-  const handleMobileProgressTouchStart = (e) => {
-    if (!duration) return;
-    setIsDraggingMobileProgress(true);
-    usePlayerStore.getState().setIsDraggingProgress(true);
-    handleMobileProgressDrag(e.touches[0]);
-  };
+  const mobileProgressBarRef = useRef(null);
+  const mobileFillRef = useRef(null);
+  const mobileThumbRef = useRef(null);
 
-  const handleMobileProgressTouchMove = (e) => {
-    if (!isDraggingMobileProgress || !duration) return;
-    e.preventDefault();
-    handleMobileProgressDrag(e.touches[0]);
-  };
+  const {
+    handleDragStart: handleMobileDragStart,
+    handleDragMove: handleMobileDragMove,
+    handleDragEnd: handleMobileDragEnd,
+    attachMouseEvents: attachMobileMouseEvents,
+    attachTouchEvents: attachMobileTouchEvents,
+    isDraggingRef: isMobileDraggingRef,
+    updateVisuals: updateMobileVisuals,
+  } = useProgressDrag({
+    getDuration: () => duration,
+    getCurrentPosition: () => currentPosition,
+    onSeek: seekTo,
+    progressBarRef: mobileProgressBarRef,
+    fillRef: mobileFillRef,
+    thumbRef: mobileThumbRef,
+  });
 
-  const handleMobileProgressTouchEnd = () => {
-    if (!isDraggingMobileProgress) return;
-    setIsDraggingMobileProgress(false);
-    usePlayerStore.getState().setIsDraggingProgress(false);
-  };
+  const handleMobileClick = useProgressClick({
+    getDuration: () => duration,
+    getCurrentPosition: () => currentPosition,
+    onSeek: seekTo,
+    progressBarRef: mobileProgressBarRef,
+  });
 
-  const handleMobileProgressDrag = (touch) => {
-    if (!mobileProgressRef.current || !duration) return;
-    const rect = mobileProgressRef.current.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (touch.clientX - rect.left) / rect.width));
-    const newPosition = percent * duration;
-    usePlayerStore.getState().seekTo(newPosition);
-  };
+  useEffect(() => {
+    if (mobileProgressBarRef.current) {
+      const cleanupMouse = attachMobileMouseEvents(mobileProgressBarRef.current);
+      const cleanupTouch = attachMobileTouchEvents(mobileProgressBarRef.current);
+      return () => {
+        cleanupMouse();
+        cleanupTouch();
+      };
+    }
+  }, [attachMobileMouseEvents, attachMobileTouchEvents]);
 
   const formatTime = (s) => {
     if (!s || isNaN(s) || !isFinite(s)) return '0:00';
@@ -180,7 +191,6 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
 
   const handleNavClick = (path, isActive) => {
     if (isActive) {
-      // Already on this page, just scroll to top instead of reloading
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       navigate(path);
@@ -210,9 +220,8 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     if (delta > 40) onRevealPlayer?.();
   };
 
- const showPlayerControls = Boolean(currentTrack && !isPlayerHidden);
+  const showPlayerControls = Boolean(currentTrack && !isPlayerHidden);
 
-// click outside handler to close volume slider
   useEffect(() => {
     const handleClickOutside = (e) => {
       const clickedOutsideContainer = volumeContainerRef.current && !volumeContainerRef.current.contains(e.target);
@@ -228,14 +237,13 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     }
   }, [showVolumeSlider]);
 
- const handleVolumeButtonClick = (e) => {
- e.stopPropagation();
- setShowVolumeSlider(!showVolumeSlider);
- };
+  const handleVolumeButtonClick = (e) => {
+  e.stopPropagation();
+  setShowVolumeSlider(!showVolumeSlider);
+  };
 
   const handleApplyAudioSettings = async (settings) => {
     try {
-      // Save settings to backend
       const response = await fetch('/api/audio-processing/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -244,21 +252,17 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
 
       if (response.ok) {
         setAudioProcessingSettings(settings);
-        // Update the store settings
         usePlayerStore.setState(state => ({
           settings: {
             ...state.settings,
             audioProcessing: settings
           }
         }));
-        // Could show a success message here
-      } else {
       }
     } catch (error) {
     }
   };
 
-  // Auto-apply audio normalization on mount
   useEffect(() => {
     const defaultSettings = {
       normalize: true,
@@ -274,8 +278,6 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
         makeup: 8
       }
     };
-    
-    // Apply default settings automatically
     handleApplyAudioSettings(defaultSettings);
   }, []);
 
@@ -342,15 +344,15 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  playPause();
  }}
   className="rounded-full p-2.5 bg-[#ffbb20] text-black hover:bg-[#ffcc40] active:scale-95 transition-all"
-  style={{ minWidth: 0, minHeight: 0 }}
-  aria-label={isPlaying ? 'pause' : 'play'}
-  >
-  {isPlaying ? (
-  <Pause className="h-5 w-5 fill-current" />
-  ) : (
-  <Play className="h-5 w-5 fill-current pl-0.5" />
-  )}
-  </button>
+ style={{ minWidth: 0, minHeight: 0 }}
+ aria-label={isPlaying ? 'pause' : 'play'}
+ >
+ {isPlaying ? (
+ <Pause className="h-5 w-5 fill-current" />
+ ) : (
+ <Play className="h-5 w-5 fill-current pl-0.5" />
+ )}
+ </button>
 
  <button
  onClick={nextTrack}
@@ -360,16 +362,16 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  <SkipForward className="h-4 w-4 fill-current" />
  </button>
 
-  
-  {/* Volume button with popup slider */}
-  <div ref={volumeContainerRef} className="relative">
-  <button
-  onClick={handleVolumeButtonClick}
-  className={`rounded-full p-2 transition-colors ${showVolumeSlider ? 'bg-[#ffbb20]/20 text-[#ffbb20]' : 'bg-[#2a1f0f] text-white hover:bg-[#3a2f1f]'}`}
-  aria-label="volume"
-  >
-  {isMuted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-  </button>
+ 
+ {/* Volume button with popup slider */}
+ <div ref={volumeContainerRef} className="relative">
+ <button
+ onClick={handleVolumeButtonClick}
+ className={`rounded-full p-2 transition-colors ${showVolumeSlider ? 'bg-[#ffbb20]/20 text-[#ffbb20]' : 'bg-[#2a1f0f] text-white hover:bg-[#3a2f1f]'}`}
+ aria-label="volume"
+ >
+ {isMuted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+ </button>
 
  {/* Volume slider popup - centered above the button, with longer background */}
  {showVolumeSlider && (
@@ -383,7 +385,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  onClick={() => setIsMuted(!isMuted)}
  className="p-1.5 rounded-full text-white/70 hover:text-[#ffbb20] flex-shrink-0"
  >
- {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+ {isMuted || volume === 0 ? <VolumeX className="w-4 w-4" /> : <Volume2 className="w-4 h-4" />}
  </button>
  <input
  type="range"
@@ -421,21 +423,22 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  <div className="flex items-center gap-2 flex-1 justify-center">
  <div className="flex items-center gap-2 w-full max-w-xs lg:max-w-sm">
  <span className="text-white/40 text-xs flex-shrink-0">{formatTime(currentPosition)}</span>
- <input
- type="range"
- min="0"
- max={duration || 100}
- value={isDraggingProgress ? (pendingSeek ?? currentPosition) : currentPosition}
- onChange={handleProgressChange}
- onMouseDown={() => { setIsDraggingProgress(true); usePlayerStore.getState().setIsDraggingProgress(true); }}
- onMouseUp={handleProgressEnd}
- onTouchStart={() => { setIsDraggingProgress(true); usePlayerStore.getState().setIsDraggingProgress(true); }}
- onTouchEnd={handleProgressEnd}
- className="flex-1 h-1 rounded-full appearance-none cursor-pointer" step="any"
- style={{
- '--progress': `${progressPercent}%`,
- }}
- />
+<div 
+    ref={desktopProgressBarRef}
+    className="relative flex-1 h-1.5 bg-[#222] rounded-full cursor-pointer"
+    onClick={handleDesktopClick}
+    onMouseDown={(e) => handleDesktopDragStart(e.clientX)}
+    onTouchStart={(e) => handleDesktopDragStart(e.touches[0].clientX)}
+  >
+    <div 
+      ref={desktopFillRef}
+      className="absolute left-0 top-0 bottom-0 bg-[#f6b012] rounded-full"
+    />
+    <div 
+      ref={desktopThumbRef}
+      className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
+    />
+  </div>
  <span className="text-white/40 text-xs flex-shrink-0">{formatTime(duration)}</span>
  </div>
  </div>
@@ -456,17 +459,17 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  </div>
  </div>
 
-      {/* ===== BOTTOM NAV BAR ===== */}
-      <nav
-        className="fixed bottom-0 left-0 right-0 bg-[#050505] border-t-2 border-[#ffbb20] flex flex-col pb-safe z-40"
-        onTouchStart={handleQuickActionsTouchStart}
-        onTouchEnd={handleQuickActionsTouchEnd}
-        style={{ fontFamily: '"Varela Round", sans-serif' }}
-      >
- {/* ===== MOBILE PLAYER STRIP (hidden on desktop) ===== */}
- {showPlayerControls && (
- <div className="md:hidden">
-{/* Track info row - title and artist centered on screen */}
+       {/* ===== BOTTOM NAV BAR ===== */}
+       <nav
+         className="fixed bottom-0 left-0 right-0 bg-[#050505] border-t-2 border-[#ffbb20] flex flex-col pb-safe z-40"
+         onTouchStart={handleQuickActionsTouchStart}
+         onTouchEnd={handleQuickActionsTouchEnd}
+         style={{ fontFamily: '"Varela Round", sans-serif' }}
+       >
+{/* ===== MOBILE PLAYER STRIP (hidden on desktop) ===== */}
+  {showPlayerControls && (
+  <div className="md:hidden flex-shrink-0">
+ {/* Track info row - title and artist centered on screen */}
  <div className="relative flex items-center px-3 pt-0 pb-0" style={{ minHeight: '32px' }}>
  {/* Cover art - left side */}
  {currentTrack.cover_art_url ? (
@@ -493,161 +496,150 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  </div>
  </div>
 
- {/* Mobile controls - play button absolutely centered on screen */}
- <div className="relative flex items-center justify-center py-1" style={{ minHeight: '48px', width: '100%' }}>
+{/* Mobile controls - flex layout to prevent overlap */}
+  <div className="flex items-center justify-between px-4 py-2 mb-4" style={{ minHeight: '48px' }}>
+    {/* Left group: lyrics, repeat */}
+   <div className="flex items-center gap-2">
+     <button
+     onClick={() => { navigate('/player'); }}
+     className="w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-none text-white"
+     aria-label="lyrics"
+     >
+     <MessageSquareText className="w-5 h-5" />
+     </button>
 
- {/* Lyrics - far left */}
- <button
- onClick={() => { navigate('/player'); }}
- className="w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-none text-white"
- style={{ position: 'absolute', left: '8px' }}
- aria-label="lyrics"
- >
- <MessageSquareText className="w-5 h-5" />
- </button>
+     <button
+       onClick={() => setRepeatMode(repeatMode === 'none' ? 'all' : repeatMode === 'all' ? 'one' : 'none')}
+       className={`w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-none ${repeatMode !== 'none' ? 'text-[#ffb10f]' : 'text-white'}`}
+       aria-label={repeatMode === 'one' ? 'repeat one' : repeatMode === 'all' ? 'repeat all' : 'repeat off'}
+     >
+       {repeatMode === 'one' ? <Repeat1 className="w-5 h-5" /> : <Repeat className="w-5 h-5" />}
+     </button>
+   </div>
 
- {/* Repeat - centered between lyrics and previous */}
-        <button
-          onClick={() => setRepeatMode(repeatMode === 'none' ? 'all' : repeatMode === 'all' ? 'one' : 'none')}
-          className={`w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-none ${repeatMode !== 'none' ? 'text-[#ffb10f]' : 'text-white'}`}
-          style={{ position: 'absolute', left: 'calc(25% - 32px)' }}
-          aria-label={repeatMode === 'one' ? 'repeat one' : repeatMode === 'all' ? 'repeat all' : 'repeat off'}
-        >
-          {repeatMode === 'one' ? <Repeat1 className="w-5 h-5" /> : <Repeat className="w-5 h-5" />}
-        </button>
+   {/* Center group: previous, play/pause, next - flex layout */}
+   <div className="flex items-center justify-center gap-3">
+     <button
+     onClick={previousTrack}
+     className="w-11 h-11 flex items-center justify-center text-white rounded-full active:scale-90 transition-none"
+     aria-label="previous"
+     >
+     <SkipBack className="w-6 h-6 fill-current" />
+     </button>
 
- {/* Previous - left of play */}
- <button
- onClick={previousTrack}
- className="w-11 h-11 flex items-center justify-center text-white rounded-full active:scale-90 transition-none"
- style={{ position: 'absolute', left: 'calc(50% - 72px)' }}
- aria-label="previous"
- >
- <SkipBack className="w-6 h-6 fill-current" />
- </button>
+<button
+      onClick={() => { triggerImpact('medium'); playPause(); }}
+      className="flex items-center justify-center bg-[#ffb10f] text-black rounded-full active:scale-90 transition-none player-play-btn w-6 h-6"
+      aria-label={isPlaying ? 'pause' : 'play'}
+      >
+      {isPlaying
+      ? <Pause className="w-3.5 h-3.5 fill-current" />
+      : <Play className="w-3.5 h-3.5 fill-current" style={{ marginLeft: '1px' }} />
+      }
+      </button>
 
-  {/* Play/Pause - absolutely centered */}
-  <button
-  onClick={() => { triggerImpact('medium'); playPause(); }}
-  style={{ width: '36px', height: '36px', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}
-  className="flex items-center justify-center bg-[#ffb10f] text-black rounded-full active:scale-90 transition-none player-play-btn"
-  aria-label={isPlaying ? 'pause' : 'play'}
-  >
-  {isPlaying
-  ? <Pause className="w-5 h-5 fill-current" />
-  : <Play className="w-5 h-5 fill-current" style={{ marginLeft: '1px' }} />
-  }
-  </button>
+     <button
+     onClick={nextTrack}
+     className="w-11 h-11 flex items-center justify-center text-white rounded-full active:scale-90 transition-none"
+     aria-label="next"
+     >
+     <SkipForward className="w-6 h-6 fill-current" />
+     </button>
+   </div>
 
- {/* Next - right of play */}
- <button
- onClick={nextTrack}
- className="w-11 h-11 flex items-center justify-center text-white rounded-full active:scale-90 transition-none"
- style={{ position: 'absolute', left: 'calc(50% + 28px)' }}
- aria-label="next"
- >
- <SkipForward className="w-6 h-6 fill-current" />
- </button>
+   {/* Right group: shuffle, queue */}
+   <div className="flex items-center gap-2">
+     <button
+       onClick={toggleShuffle}
+       className={`w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-none ${shuffle ? 'text-[#ffb10f]' : 'text-white'}`}
+       aria-label={shuffle ? 'shuffle on' : 'shuffle off'}
+     >
+     <Shuffle className="w-5 h-5" />
+     </button>
 
- {/* Shuffle - centered between next and queue */}
-        <button
-          onClick={toggleShuffle}
-          className={`w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-none ${shuffle ? 'text-[#ffb10f]' : 'text-white'}`}
-          style={{ position: 'absolute', left: 'calc(75% - 11px)' }}
- aria-label={shuffle ? 'shuffle on' : 'shuffle off'}
- >
- <Shuffle className="w-5 h-5" />
- </button>
-
- {/* Queue - far right */}
- <button
- onClick={toggleQueue}
- className={`w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-none ${showQueue ? 'text-[#ffb10f]' : 'text-white'}`}
- style={{ position: 'absolute', right: '8px' }}
- aria-label="queue"
- >
- <ListMusic className="w-5 h-5" />
- </button>
-
+     <button
+     onClick={toggleQueue}
+     className={`w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-none ${showQueue ? 'text-[#ffb10f]' : 'text-white'}`}
+     aria-label="queue"
+     >
+     <ListMusic className="w-5 h-5" />
+     </button>
+   </div>
  </div>
-  <div className="px-3 pt-0 pb-0 mt-1">
-          {/* Custom progress bar - div-based for better Android WebView support */}
-          <div
-            ref={mobileProgressRef}
-            className="w-full h-1.5 bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer relative"
-            onClick={handleProgressClick}
-            onTouchStart={handleMobileProgressTouchStart}
-            onTouchMove={handleMobileProgressTouchMove}
-            onTouchEnd={handleMobileProgressTouchEnd}
-          >
-            {/* Progress fill bar */}
-            <div
-              className="absolute left-0 top-0 bottom-0 bg-[#f6b012] rounded-full transition-all duration-100"
-              style={{
-                width: `${progressPercent}%`
-              }}
-            />
-            {/* Yellow thumb/circle indicator */}
-            <div
-              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm transition-all duration-100"
-              style={{
-                left: `calc(${progressPercent}% - 6px)`
-              }}
-            />
-          </div>
-          <div className="flex justify-between mt-1">
-            <span className="text-white/40 text-[10px]">{formatTime(currentPosition)}</span>
-            <span className="text-white/40 text-[10px]">{formatTime(duration)}</span>
-          </div>
-        </div>
-      </div>
-    )}
 
-{/* No track playing on mobile - show simple quick actions */}
-        {!showPlayerControls && (
-          <div className="md:hidden px-4 pt-2 pb-1 flex justify-center gap-2">
-            <button
-              type="button"
-              onClick={() => handleToggle('offline')}
-              disabled={pendingAction === 'offline'}
-              className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold ${offlineActive ? 'border-[#ffbb20] bg-[#ffbb20]/10 text-[#ffbb20]' : 'border-white/10 bg-white/5 text-white/70'}`}
-            >
-              <WifiOff className="w-3.5 h-3.5" fill="none" strokeWidth={2} />
-              <span>{offlineActive ? 'offline on' : 'offline'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleToggle('lowPower')}
-              disabled={pendingAction === 'lowPower'}
-              className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold ${lowPowerActive ? 'border-[#ffbb20] bg-[#ffbb20]/10 text-[#ffbb20]' : 'border-white/10 bg-white/5 text-white/70'}`}
-            >
-              <Zap className="w-3.5 h-3.5" fill="none" strokeWidth={2} />
-              <span>low data</span>
-            </button>
-          </div>
-        )}
+{/* Progress bar - div-based for better Android WebView support */}
+  <div className="mt-4">
+    <div
+    ref={mobileProgressBarRef}
+    className="w-full h-1.5 bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer relative"
+    onClick={handleMobileClick}
+    onMouseDown={(e) => handleMobileDragStart(e.clientX)}
+    onTouchStart={(e) => handleMobileDragStart(e.touches[0].clientX)}
+  >
+    {/* Progress fill bar */}
+    <div
+      ref={mobileFillRef}
+      className="absolute left-0 top-0 bottom-0 bg-[#f6b012] rounded-full"
+    />
+    {/* Yellow thumb/circle indicator */}
+    <div
+      ref={mobileThumbRef}
+      className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
+    />
+  </div>
+  <div className="flex justify-between mt-1">
+    <span className="text-white/40 text-[10px]">{formatTime(currentPosition)}</span>
+    <span className="text-white/40 text-[10px]">{formatTime(duration)}</span>
+  </div>
+  </div>
+  </div>
+  )}
 
-        {/* Nav icons row (always shown) */}
-        <div className="flex justify-around items-center h-14 xl:h-16">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = getIsActive(item);
-            return (
-              <button
-                key={item.path}
-                onClick={() => handleNavClick(item.path, isActive)}
-                className={`flex flex-col items-center justify-center flex-1 h-full transition-none ${isActive ? 'text-[#f6b012]' : 'text-white'} hover:text-[#ffd86a]`}
-              >
-                <Icon className="w-6 h-6 xl:w-10 xl:h-10 stroke-current" fill="none" strokeWidth={2} />
-                <span className="hidden md:block text-xs xl:text-sm lowercase leading-none mt-0.5 xl:mt-1">
-                  {item.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </nav>
+ {/* No track playing on mobile - show simple quick actions */}
+ {!showPlayerControls && (
+   <div className="md:hidden px-4 pt-2 pb-1 flex justify-center gap-2">
+     <button
+       type="button"
+       onClick={() => handleToggle('offline')}
+       disabled={pendingAction === 'offline'}
+       className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold ${offlineActive ? 'border-[#ffbb20] bg-[#ffbb20]/10 text-[#ffbb20]' : 'border-white/10 bg-white/5 text-white/70'}`}
+     >
+       <WifiOff className="w-3.5 h-3.5" fill="none" strokeWidth={2} />
+       <span>{offlineActive ? 'offline on' : 'offline'}</span>
+     </button>
+     <button
+       type="button"
+       onClick={() => handleToggle('lowPower')}
+       disabled={pendingAction === 'lowPower'}
+       className={`flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs font-semibold ${lowPowerActive ? 'border-[#ffbb20] bg-[#ffbb20]/10 text-[#ffbb20]' : 'border-white/10 bg-white/5 text-white/70'}`}
+     >
+       <Zap className="w-3.5 h-3.5" fill="none" strokeWidth={2} />
+       <span>low data</span>
+     </button>
+   </div>
+ )}
 
-    </>
-  );
+ {/* Nav icons row (always shown) */}
+ <div className="flex justify-around items-center h-14 xl:h-16">
+   {navItems.map((item) => {
+     const Icon = item.icon;
+     const isActive = getIsActive(item);
+     return (
+       <button
+         key={item.path}
+         onClick={() => handleNavClick(item.path, isActive)}
+         className={`flex flex-col items-center justify-center flex-1 h-full transition-none ${isActive ? 'text-[#f6b012]' : 'text-white'} hover:text-[#ffd86a]`}
+       >
+         <Icon className="w-6 h-6 xl:w-10 xl:h-10 stroke-current" fill="none" strokeWidth={2} />
+         <span className="hidden md:block text-xs xl:text-sm lowercase leading-none mt-0.5 xl:mt-1">
+           {item.label}
+         </span>
+       </button>
+     );
+   })}
+ </div>
+ </nav>
+
+ </>
+ );
 }

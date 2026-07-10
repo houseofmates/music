@@ -22,6 +22,8 @@ android {
             storePassword 'android'
             keyAlias 'music-key'
             keyPassword 'android'
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
     buildTypes {

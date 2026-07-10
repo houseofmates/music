@@ -558,7 +558,22 @@ export const usePlayerStore = create((set, get) => ({
 
   // Dragging state for progress bars (prevents timeupdate override)
   isDraggingProgress: false,
-  setIsDraggingProgress: (v) => set({ isDraggingProgress: Boolean(v) }),
+  setIsDraggingProgress: (v) => {
+    const boolVal = Boolean(v);
+    set({ isDraggingProgress: boolVal });
+    // Also update ref for synchronous access in event handlers
+    if (typeof window !== 'undefined') {
+      window.__isDraggingProgressRef = boolVal;
+    }
+  },
+  
+  // Synchronous ref for isDraggingProgress (accessible in event handlers without React batching delay)
+  getIsDraggingProgressRef: () => {
+    if (typeof window !== 'undefined') {
+      return { get current() { return !!window.__isDraggingProgressRef; } };
+    }
+    return { get current() { return false; } };
+  },
   
   fadeAudio: (audio, toVolume, duration = 600) => {
     if (!audio) return;
