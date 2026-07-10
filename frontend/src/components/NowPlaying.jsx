@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePlayerStore } from "../store";
 import { 
   Play, 
@@ -19,7 +19,6 @@ import {
 import { shallow } from "zustand/shallow";
 import ImageWithFallback from "./ImageWithFallback";
 import LyricsPanel from "./LyricsPanel";
-import EnhancedMetadataPanel from "./EnhancedMetadataPanel";
 import { resolveMediaUrl } from "../api.js";
 import { triggerImpact } from "../utils/haptics";
 import { useProgressDrag } from "../hooks/useProgressDrag";

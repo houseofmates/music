@@ -1,8 +1,8 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
-  Home, Music, Heart, Clock, ListMusic, WifiOff, Zap, PlayCircle,
+  Home, Music, Heart, Clock, ListMusic, WifiOff, Zap,
   User, Disc3, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat,
-  Repeat1, MessageSquareText, Volume2, VolumeX, Download, Settings,
+  Repeat1, MessageSquareText, Volume2, VolumeX,
 } from '../icons.jsx';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { shallow } from 'zustand/shallow';
