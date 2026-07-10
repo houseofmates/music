@@ -1,0 +1,32 @@
+directories:
+  output: release
+  buildResources: build
+appId: com.house.music
+productName: Music
+files:
+  - filter:
+      - dist/**/*
+      - electron/**/*
+      - package.json
+      - '!node_modules/**/*'
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: tar.gz
+      arch:
+        - x64
+  category: Audio
+  icon: electron/icons
+  executableName: music
+  maintainer: house
+  vendor: house
+  synopsis: Music player app
+  description: A desktop music player application
+appImage:
+  artifactName: ${productName}-${version}.${ext}
+  category: Audio
+asar: false
+compression: store
+electronVersion: 41.5.0

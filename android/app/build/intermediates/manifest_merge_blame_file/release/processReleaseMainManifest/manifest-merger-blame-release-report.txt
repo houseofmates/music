@@ -1,0 +1,248 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.house.music"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="34" />
+10
+11    <!-- Permissions -->
+12    <uses-permission android:name="android.permission.INTERNET" />
+12-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:67:5-67
+12-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:67:22-64
+13    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+13-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:68:5-79
+13-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:68:22-76
+14    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+14-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:69:5-80
+14-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:69:22-77
+15    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+15-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:70:5-81
+15-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:70:22-78
+16
+17    <!-- Foreground service for media playback - required for Android 12+ -->
+18    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+18-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:73:5-77
+18-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:73:22-74
+19    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+19-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:74:5-92
+19-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:74:22-89
+20
+21    <!-- Wake lock to prevent CPU sleep during playback -->
+22    <uses-permission android:name="android.permission.WAKE_LOCK" />
+22-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:77:5-68
+22-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:77:22-65
+23
+24    <!-- Notifications for foreground service -->
+25    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+25-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:80:5-77
+25-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:80:22-74
+26
+27    <!-- Allow concurrent audio playback -->
+28    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+28-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:83:5-80
+28-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:83:22-77
+29
+30    <!-- Battery optimization exemption: lets us ask the user to whitelist this app -->
+31    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+31-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:86:5-95
+31-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:86:22-92
+32
+33    <!-- Media button handling for Bluetooth -->
+34    <uses-permission android:name="android.permission.BLUETOOTH" />
+34-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:89:5-68
+34-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:89:22-65
+35    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+35-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:90:5-76
+35-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:90:22-73
+36
+37    <permission
+37-->[androidx.core:core:1.13.0] /home/house/.gradle/caches/8.13/transforms/d115fb15f09a2deca6409087d5fef1dc/transformed/core-1.13.0/AndroidManifest.xml:22:5-24:47
+38        android:name="com.house.music.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+38-->[androidx.core:core:1.13.0] /home/house/.gradle/caches/8.13/transforms/d115fb15f09a2deca6409087d5fef1dc/transformed/core-1.13.0/AndroidManifest.xml:23:9-81
+39        android:protectionLevel="signature" />
+39-->[androidx.core:core:1.13.0] /home/house/.gradle/caches/8.13/transforms/d115fb15f09a2deca6409087d5fef1dc/transformed/core-1.13.0/AndroidManifest.xml:24:9-44
+40
+41    <uses-permission android:name="com.house.music.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+41-->[androidx.core:core:1.13.0] /home/house/.gradle/caches/8.13/transforms/d115fb15f09a2deca6409087d5fef1dc/transformed/core-1.13.0/AndroidManifest.xml:26:5-97
+41-->[androidx.core:core:1.13.0] /home/house/.gradle/caches/8.13/transforms/d115fb15f09a2deca6409087d5fef1dc/transformed/core-1.13.0/AndroidManifest.xml:26:22-94
+42
+43    <application
+43-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:4:5-64:19
+44        android:allowBackup="true"
+44-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:5:9-35
+45        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+45-->[androidx.core:core:1.13.0] /home/house/.gradle/caches/8.13/transforms/d115fb15f09a2deca6409087d5fef1dc/transformed/core-1.13.0/AndroidManifest.xml:28:18-86
+46        android:extractNativeLibs="false"
+47        android:icon="@mipmap/ic_launcher"
+47-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:6:9-43
+48        android:label="@string/app_name"
+48-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:7:9-41
+49        android:networkSecurityConfig="@xml/network_security_config"
+49-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:12:9-69
+50        android:roundIcon="@mipmap/ic_launcher_round"
+50-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:8:9-54
+51        android:supportsRtl="true"
+51-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:9:9-35
+52        android:theme="@style/AppTheme"
+52-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:10:9-40
+53        android:usesCleartextTraffic="true" >
+53-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:11:9-44
+54        <activity
+54-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:14:9-29:20
+55            android:name="com.house.music.MainActivity"
+55-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:16:13-41
+56            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|screenLayout|density"
+56-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:15:13-150
+57            android:exported="true"
+57-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:20:13-36
+58            android:label="@string/title_activity_main"
+58-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:17:13-56
+59            android:launchMode="singleTask"
+59-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:19:13-44
+60            android:persistent="true"
+60-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:21:13-38
+61            android:screenOrientation="unspecified"
+61-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:22:13-52
+62            android:theme="@style/AppTheme.NoActionBarLaunch" >
+62-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:18:13-62
+63            <intent-filter>
+63-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:24:13-27:29
+64                <action android:name="android.intent.action.MAIN" />
+64-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:25:17-69
+64-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:25:25-66
+65
+66                <category android:name="android.intent.category.LAUNCHER" />
+66-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:26:17-77
+66-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:26:27-74
+67            </intent-filter>
+68        </activity>
+69
+70        <receiver
+70-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:31:9-43:20
+71            android:name="com.house.music.MusicWidgetProvider"
+71-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:32:13-48
+72            android:exported="true"
+72-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:33:13-36
+73            android:label="@string/widget_name"
+73-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:34:13-48
+74            android:permission="android.permission.BIND_APPWIDGET" >
+74-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:35:13-67
+75            <intent-filter>
+75-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:36:13-38:29
+76                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+76-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:37:17-84
+76-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:37:25-81
+77            </intent-filter>
+78
+79            <meta-data
+79-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:40:13-42:61
+80                android:name="android.appwidget.provider"
+80-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:41:17-58
+81                android:resource="@xml/music_widget_info" />
+81-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:42:17-58
+82        </receiver>
+83
+84        <service
+84-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:45:9-48:72
+85            android:name="com.house.music.MusicWidgetService"
+85-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:46:13-47
+86            android:exported="false"
+86-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:47:13-37
+87            android:permission="android.permission.BIND_REMOTEVIEWS" />
+87-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:48:13-69
+88        <service
+88-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:50:9-53:40
+89            android:name="de.appplant.cordova.plugin.background.ForegroundService"
+89-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:51:13-83
+90            android:exported="false"
+90-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:53:13-37
+91            android:foregroundServiceType="mediaPlayback|mediaPlayback" />
+91-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:52:13-58
+92
+93        <provider
+94            android:name="androidx.core.content.FileProvider"
+94-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:56:13-62
+95            android:authorities="com.house.music.fileprovider"
+95-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:57:13-64
+96            android:exported="false"
+96-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:58:13-37
+97            android:grantUriPermissions="true" >
+97-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:59:13-47
+98            <meta-data
+98-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:60:13-62:64
+99                android:name="android.support.FILE_PROVIDER_PATHS"
+99-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:61:17-67
+100                android:resource="@xml/file_paths" />
+100-->/home/house/music-app/android/app/src/main/AndroidManifest.xml:62:17-51
+101        </provider>
+102        <provider
+102-->[androidx.emoji2:emoji2:1.3.0] /home/house/.gradle/caches/8.13/transforms/c9c4bd7d661652e00a0e6afa70019e4e/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+103            android:name="androidx.startup.InitializationProvider"
+103-->[androidx.emoji2:emoji2:1.3.0] /home/house/.gradle/caches/8.13/transforms/c9c4bd7d661652e00a0e6afa70019e4e/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:25:13-67
+104            android:authorities="com.house.music.androidx-startup"
+104-->[androidx.emoji2:emoji2:1.3.0] /home/house/.gradle/caches/8.13/transforms/c9c4bd7d661652e00a0e6afa70019e4e/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:26:13-68
+105            android:exported="false" >
+105-->[androidx.emoji2:emoji2:1.3.0] /home/house/.gradle/caches/8.13/transforms/c9c4bd7d661652e00a0e6afa70019e4e/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:27:13-37
+106            <meta-data
+106-->[androidx.emoji2:emoji2:1.3.0] /home/house/.gradle/caches/8.13/transforms/c9c4bd7d661652e00a0e6afa70019e4e/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+107                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+107-->[androidx.emoji2:emoji2:1.3.0] /home/house/.gradle/caches/8.13/transforms/c9c4bd7d661652e00a0e6afa70019e4e/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:30:17-75
+108                android:value="androidx.startup" />
+108-->[androidx.emoji2:emoji2:1.3.0] /home/house/.gradle/caches/8.13/transforms/c9c4bd7d661652e00a0e6afa70019e4e/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:31:17-49
+109            <meta-data
+109-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/house/.gradle/caches/8.13/transforms/5311c873cf1b2e15adede446fd34ca54/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:29:13-31:52
+110                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+110-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/house/.gradle/caches/8.13/transforms/5311c873cf1b2e15adede446fd34ca54/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:30:17-78
+111                android:value="androidx.startup" />
+111-->[androidx.lifecycle:lifecycle-process:2.6.2] /home/house/.gradle/caches/8.13/transforms/5311c873cf1b2e15adede446fd34ca54/transformed/jetified-lifecycle-process-2.6.2/AndroidManifest.xml:31:17-49
+112            <meta-data
+112-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+113                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+113-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+114                android:value="androidx.startup" />
+114-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+115        </provider>
+116
+117        <receiver
+117-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+118            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+118-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+119            android:directBootAware="false"
+119-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+120            android:enabled="true"
+120-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+121            android:exported="true"
+121-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+122            android:permission="android.permission.DUMP" >
+122-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+123            <intent-filter>
+123-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+124                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+124-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+124-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+125            </intent-filter>
+126            <intent-filter>
+126-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+127                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+127-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+127-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+128            </intent-filter>
+129            <intent-filter>
+129-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+130                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+130-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+130-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+131            </intent-filter>
+132            <intent-filter>
+132-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+133                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+133-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+133-->[androidx.profileinstaller:profileinstaller:1.3.1] /home/house/.gradle/caches/8.13/transforms/7acf96d0eeba46cf2566add2af8735f9/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+134            </intent-filter>
+135        </receiver>
+136    </application>
+137
+138</manifest>

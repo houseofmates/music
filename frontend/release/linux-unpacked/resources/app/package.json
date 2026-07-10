@@ -1,0 +1,30 @@
+{
+  "name": "music",
+  "private": true,
+  "version": "1.0.0",
+  "description": "desktop music player app",
+  "author": "house",
+  "main": "electron/main.js",
+  "dependencies": {
+    "@capacitor-community/http": "^1.4.1",
+    "@capacitor/android": "^5.7.0",
+    "@capacitor/app": "^5.0.6",
+    "@capacitor/core": "^5.7.0",
+    "@capacitor/device": "^5.0.8",
+    "@capacitor/splash-screen": "^5.0.6",
+    "@capacitor/status-bar": "^5.0.6",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@types/annyang": "^2.6.0",
+    "annyang": "^3.0.0",
+    "axios": "^1.6.5",
+    "cordova-plugin-background-mode": "^0.7.3",
+    "cordova-plugin-device": "^3.0.0",
+    "lucide-react": "^0.312.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.21.0",
+    "zustand": "^4.4.7"
+  }
+}

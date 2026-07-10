@@ -1,0 +1,67 @@
+services:
+  backend:
+    build: ./backend
+    container_name: music-backend
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    volumes:
+      - /mnt/nextcloud/house/files/media/music:/music
+      - ./backend/data/music.db:/app/music.db
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=sqlite:////app/music.db
+      - MUSIC_DIR=/music
+      - DEBUG=False
+      - CORS_ORIGINS=*
+    restart: unless-stopped
+    networks:
+      - music-network
+
+  file-watcher:
+    build: ./backend
+    container_name: music-file-watcher
+    command: python file_watcher.py
+    volumes:
+      - /mnt/nextcloud/house/files/media/music:/music
+      - ./backend:/app
+      - ./backend/data/music.db:/app/music.db
+    environment:
+      - DATABASE_URL=sqlite:////app/music.db
+      - MUSIC_DIR=/music
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - music-network
+
+  frontend:
+    build: ./frontend
+    container_name: music-frontend
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - music-network
+    environment:
+      - PORT=3006
+      # Use reverse proxy /api in web deployment instead of internal Docker network host.
+      - VITE_API_URL=/api
+
+  nginx:
+    image: nginx:alpine
+    container_name: music-nginx
+    ports:
+      - "3006:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    networks:
+      - music-network
+
+networks:
+  music-network:
+    driver: bridge

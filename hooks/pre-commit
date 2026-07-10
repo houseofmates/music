@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# helper hook that can be symlinked to .git/hooks/pre-commit
+# it will rebuild release artifacts so the repo can track updated APK/AppImage.
+
+if [ -x "$(pwd)/scripts/build_releases.sh" ]; then
+  echo "🔁 running releases build from pre-commit hook..."
+  ./scripts/build_releases.sh
+else
+  echo "⚠️  build_releases.sh not found or not executable"
+fi

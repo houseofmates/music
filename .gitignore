@@ -1,0 +1,69 @@
+# Backend
+backend/__pycache__/
+backend/*.pyc
+backend/.pytest_cache/
+backend/venv/
+backend/.env
+backend/music.db
+backend/alembic/versions/*.py
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Root app
+*.db
+*.sqlite
+*.jwt_secret
+.env
+.env.*
+!.env.example
+
+# venvs
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# Logs
+*.log
+
+# Android
+android/key.properties
+android/local.properties
+*.keystore
+*.jks
+
+# Tooling / agent state
+.kilo/
+.roo/
+.windsurf/
+.amazonq/
+
+# Build outputs
+releases/
+*.apk
+*.appimage
+*.tar.gz
+
+# Nested git repos (top-level is source of truth)
+.git/
+!.github/
+
+
+# Temporary git staging artifacts (handles nested repo migrations)
+.*.hidden

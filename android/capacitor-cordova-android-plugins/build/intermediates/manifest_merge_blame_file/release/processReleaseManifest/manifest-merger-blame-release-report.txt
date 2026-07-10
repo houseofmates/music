@@ -1,0 +1,23 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:amazon="http://schemas.amazon.com/apk/res/android"
+3    xmlns:android="http://schemas.android.com/apk/res/android"
+4    package="capacitor.cordova.android.plugins" >
+5
+6    <uses-sdk android:minSdkVersion="24" />
+7
+8    <uses-permission android:name="android.permission.WAKE_LOCK" />
+8-->/home/house/music-app/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:8:1-63
+8-->/home/house/music-app/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:8:18-61
+9
+10    <application android:usesCleartextTraffic="true" >
+10-->/home/house/music-app/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:4:1-7:15
+10-->/home/house/music-app/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:4:15-50
+11        <service
+11-->/home/house/music-app/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:5:1-6:52
+12            android:name="de.appplant.cordova.plugin.background.ForegroundService"
+12-->/home/house/music-app/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:5:10-80
+13            android:foregroundServiceType="mediaPlayback" />
+13-->/home/house/music-app/android/capacitor-cordova-android-plugins/src/main/AndroidManifest.xml:6:5-50
+14    </application>
+15
+16</manifest>

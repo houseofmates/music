@@ -1,0 +1,15 @@
+[Unit]
+Description=Auto-commit system for music app
+After=network.target
+
+[Service]
+Type=simple
+User=house
+WorkingDirectory=/home/house/music-app/backend
+ExecStart=/usr/bin/python3 /home/house/music-app/backend/auto_commit.py
+Restart=always
+RestartSec=10
+Environment=PYTHONPATH=/home/house/music-app/backend
+
+[Install]
+WantedBy=multi-user.target

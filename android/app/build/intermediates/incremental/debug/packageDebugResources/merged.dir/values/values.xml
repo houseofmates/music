@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#050505</color>
+    <color name="colorAccent">#f6b012</color>
+    <color name="colorPrimary">#f6b012</color>
+    <color name="colorPrimaryDark">#050505</color>
+    <color name="splashBackground">#050505</color>
+    <color name="statusBarColor">#050505</color>
+    <string name="app_name">Music</string>
+    <string name="title_activity_main">Music</string>
+    <string name="widget_description">Music player widget with player controls and lyrics</string>
+    <string name="widget_name">Music Widget</string>
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+ <item name="colorPrimary">@color/colorPrimary</item>
+ <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+ <item name="colorAccent">@color/colorAccent</item>
+ <item name="android:windowBackground">@color/background</item>
+ <item name="android:statusBarColor">@android:color/transparent</item>
+ <item name="android:navigationBarColor">@color/background</item>
+ <item name="android:windowLightStatusBar">false</item>
+ <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+ </style>
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
+ <item name="windowActionBar">false</item>
+ <item name="windowNoTitle">true</item>
+ <item name="android:background">@null</item>
+ </style>
+    <style name="AppTheme.NoActionBarLaunch" parent="AppTheme">
+ <item name="android:background">@drawable/splash</item>
+ </style>
+</resources>

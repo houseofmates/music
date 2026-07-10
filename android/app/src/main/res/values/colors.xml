@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Music App Colors -->
+    <color name="colorPrimary">#f6b012</color>
+    <color name="colorPrimaryDark">#050505</color>
+    <color name="colorAccent">#f6b012</color>
+    
+    <!-- Background Colors -->
+    <color name="background">#050505</color>
+    <color name="splashBackground">#050505</color>
+    
+    <!-- Status Bar -->
+    <color name="statusBarColor">#050505</color>
+</resources>

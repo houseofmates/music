@@ -1,0 +1,14 @@
+rootProject.name = 'android'
+include ':app'
+include ':capacitor-android'
+include ':capacitor-app'
+include ':capacitor-splash-screen'
+include ':capacitor-status-bar'
+include ':capacitor-cordova-android-plugins'
+
+// point the capacitor plugin modules to their locations inside node_modules
+project(':capacitor-android').projectDir = new File(rootDir, '../frontend/node_modules/@capacitor/android/capacitor')
+project(':capacitor-app').projectDir = new File(rootDir, '../frontend/node_modules/@capacitor/app/android')
+project(':capacitor-splash-screen').projectDir = new File(rootDir, '../frontend/node_modules/@capacitor/splash-screen/android')
+project(':capacitor-status-bar').projectDir = new File(rootDir, '../frontend/node_modules/@capacitor/status-bar/android')
+project(':capacitor-cordova-android-plugins').projectDir = new File(rootDir, 'capacitor-cordova-android-plugins')

@@ -1,0 +1,5 @@
+  }
+
+  // All retries failed
+    throw new Error(`Failed to stream audio after ${this.retryAttempts} attempts. Last error: ${lastError.message}`);
+  }

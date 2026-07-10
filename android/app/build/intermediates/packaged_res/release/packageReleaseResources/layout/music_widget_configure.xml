@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="#050505">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Music Widget Setup"
+        android:textColor="#f6b012"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose widget display mode:"
+        android:textColor="#ffffff"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
+    <RadioGroup
+        android:id="@+id/mode_radio_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="24dp">
+
+        <RadioButton
+            android:id="@+id/radio_player"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Player - Compact player with controls"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:buttonTint="#f6b012"
+            android:layout_marginBottom="12dp" />
+
+        <RadioButton
+            android:id="@+id/radio_lyrics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Lyrics - Focus on lyrics display"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:buttonTint="#f6b012"
+            android:layout_marginBottom="12dp" />
+
+        <RadioButton
+            android:id="@+id/radio_both"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Both - Player with lyrics"
+            android:textColor="#ffffff"
+            android:textSize="14sp"
+            android:buttonTint="#f6b012" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/add_widget_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Widget"
+        android:textColor="#050505"
+        android:background="#f6b012"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:padding="12dp" />
+
+</LinearLayout>

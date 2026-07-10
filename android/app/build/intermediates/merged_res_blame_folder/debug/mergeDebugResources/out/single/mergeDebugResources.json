@@ -1,0 +1,122 @@
+[
+    {
+        "merged": "/home/house/.gradle/daemon/8.13/com.house.music.app-debug-33:/mipmap_ic_launcher_round.xml.flat",
+        "source": "/home/house/.gradle/daemon/8.13/com.house.music.app-main-35:/mipmap/ic_launcher_round.xml"
+    },
+    {
+        "merged": "/home/house/.gradle/daemon/8.13/com.house.music.app-debug-33:/layout_music_widget_queue_item.xml.flat",
+        "source": "/home/house/.gradle/daemon/8.13/com.house.music.app-main-35:/layout/music_widget_queue_item.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_cover_background.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/cover_background.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_ic_play.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/ic_play.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_ic_player.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/ic_player.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_ic_skip_previous.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/ic_skip_previous.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_ic_music_note.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/ic_music_note.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_widget_preview.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/widget_preview.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_ic_play_arrow.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/ic_play_arrow.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/xml_music_widget_info.xml.flat",
+        "source": "com.house.music.app-main-35:/xml/music_widget_info.xml"
+    },
+    {
+        "merged": "/home/house/.gradle/daemon/8.13/com.house.music.app-debug-33:/xml_file_paths.xml.flat",
+        "source": "/home/house/.gradle/daemon/8.13/com.house.music.app-main-35:/xml/file_paths.xml"
+    },
+    {
+        "merged": "/home/house/.gradle/daemon/8.13/com.house.music.app-debug-33:/layout_music_widget.xml.flat",
+        "source": "/home/house/.gradle/daemon/8.13/com.house.music.app-main-35:/layout/music_widget.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_ic_both.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/ic_both.xml"
+    },
+    {
+        "merged": "/home/house/.gradle/daemon/8.13/com.house.music.app-debug-33:/layout_music_widget_item.xml.flat",
+        "source": "/home/house/.gradle/daemon/8.13/com.house.music.app-main-35:/layout/music_widget_item.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/layout_music_widget_player.xml.flat",
+        "source": "com.house.music.app-main-35:/layout/music_widget_player.xml"
+    },
+    {
+        "merged": "/home/house/.gradle/daemon/8.13/com.house.music.app-debug-33:/xml_music_widget_info.xml.flat",
+        "source": "/home/house/.gradle/daemon/8.13/com.house.music.app-main-35:/xml/music_widget_info.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/layout_music_widget_both.xml.flat",
+        "source": "com.house.music.app-main-35:/layout/music_widget_both.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_ic_lyrics.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/ic_lyrics.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/layout_music_widget_lyrics.xml.flat",
+        "source": "com.house.music.app-main-35:/layout/music_widget_lyrics.xml"
+    },
+    {
+        "merged": "/home/house/.gradle/daemon/8.13/com.house.music.app-debug-33:/mipmap_ic_launcher.xml.flat",
+        "source": "/home/house/.gradle/daemon/8.13/com.house.music.app-main-35:/mipmap/ic_launcher.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_ic_pause.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/ic_pause.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_ic_repeat.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/ic_repeat.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/layout_music_widget_configure.xml.flat",
+        "source": "com.house.music.app-main-35:/layout/music_widget_configure.xml"
+    },
+    {
+        "merged": "/home/house/.gradle/daemon/8.13/com.house.music.app-debug-33:/xml_network_security_config.xml.flat",
+        "source": "/home/house/.gradle/daemon/8.13/com.house.music.app-main-35:/xml/network_security_config.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_ic_skip_next.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/ic_skip_next.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_ic_shuffle.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/ic_shuffle.xml"
+    },
+    {
+        "merged": "/home/house/.gradle/daemon/8.13/com.house.music.app-debug-33:/drawable_splash.xml.flat",
+        "source": "/home/house/.gradle/daemon/8.13/com.house.music.app-main-35:/drawable/splash.xml"
+    },
+    {
+        "merged": "/home/house/.gradle/daemon/8.13/com.house.music.app-debug-33:/drawable_music_widget_bg.xml.flat",
+        "source": "/home/house/.gradle/daemon/8.13/com.house.music.app-main-35:/drawable/music_widget_bg.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_widget_background.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/widget_background.xml"
+    },
+    {
+        "merged": "com.house.music.app-debug-33:/drawable_play_button_background.xml.flat",
+        "source": "com.house.music.app-main-35:/drawable/play_button_background.xml"
+    }
+]

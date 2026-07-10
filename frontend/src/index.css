@@ -1,0 +1,676 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* local @font-face to guarantee offline availability */
+@font-face {
+  font-family: 'Varela Round';
+  font-style: normal;
+  font-weight: 400;
+  src: url('./assets/fonts/varela-round.woff2') format('woff2');
+  font-display: swap;
+}
+
+/* global reset and font enforcement */
+html, body, * {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: #050505;
+}
+
+body {
+  font-family: 'Varela Round', sans-serif !important;
+  background-color: #050505;
+  color: #ffffff;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  touch-action: manipulation;
+  text-transform: lowercase;
+}
+
+/* Ensure all text elements follow lowercase rule */
+h1, h2, h3, h4, h5, h6, p, span, div, button, a, label {
+  text-transform: lowercase !important;
+}
+
+/* Capitalization exceptions for proper nouns and acronyms */
+.capitalize-first::first-letter {
+  text-transform: uppercase !important;
+}
+
+/* Enhanced golden accent system with mobile optimization */
+:root {
+  --vibe-black: #050505;
+  --vibe-gold: #f6b012;
+  --vibe-gold-hover: #f7c447;
+  --vibe-gold-active: #e5a010;
+  --vibe-gold-subtle: rgba(246, 176, 18, 0.1);
+  --vibe-gold-border: rgba(246, 176, 18, 0.3);
+  
+  /* Mobile touch target optimization */
+  --touch-target-min: 44px;
+  --touch-target-comfortable: 48px;
+  --touch-target-large: 52px;
+  --vibe-white: #ffffff;
+  --vibe-gray: rgba(255, 255, 255, 0.7);
+  --vibe-gray-light: rgba(255, 255, 255, 0.4);
+}
+
+/* Premium golden button system with mobile touch optimization */
+.btn-gold {
+  background-color: var(--vibe-gold);
+  color: var(--vibe-black);
+  border: none;
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: 'Varela Round', sans-serif;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: lowercase !important;
+}
+
+.btn-gold:hover {
+  background-color: var(--vibe-gold-hover);
+  transform: translateY(-1px);
+}
+
+.btn-gold:active {
+  background-color: var(--vibe-gold-active);
+  transform: translateY(0);
+}
+
+/* Mobile-optimized touch targets */
+.touch-target {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.touch-target-comfortable {
+  min-height: var(--touch-target-comfortable);
+  min-width: var(--touch-target-comfortable);
+}
+
+/* One-handed mobile optimization */
+.mobile-nav-item {
+  min-height: var(--touch-target-large);
+  min-width: var(--touch-target-large);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.mobile-nav-item:hover {
+  background-color: var(--vibe-gold-subtle);
+}
+
+.mobile-nav-item:active {
+  background-color: var(--vibe-gold-border);
+}
+
+/* Enhanced form controls with mobile optimization */
+input, textarea, select {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--vibe-gold-border);
+  color: var(--vibe-white);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: 'Varela Round', sans-serif;
+  font-size: 16px;
+  min-height: var(--touch-target-min);
+  transition: all 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--vibe-gold);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.btn-gold:active {
+  background-color: var(--vibe-gold-active);
+  transform: translateY(0);
+}
+
+/* Premium card system */
+.card-vibe {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(246, 176, 18, 0.2);
+  border-radius: 1rem;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.card-vibe:hover {
+  border-color: rgba(246, 176, 18, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Premium input styling */
+.input-vibe {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(246, 176, 18, 0.3);
+  border-radius: 0.5rem;
+  color: var(--vibe-white);
+  padding: 0.75rem 1rem;
+  font-family: 'Varela Round', sans-serif;
+}
+
+.input-vibe::placeholder {
+  color: var(--vibe-gray-light);
+}
+
+.input-vibe:focus {
+  outline: none;
+  border-color: var(--vibe-gold);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Premium loading animation */
+@keyframes vibe-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.loading-vibe {
+  animation: vibe-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(246, 176, 18, 0.3) 50%, 
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: vibe-shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes vibe-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Enhanced touch targets for mobile */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Premium status indicators */
+.status-online {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.status-offline {
+  color: var(--vibe-gray);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Premium progress indicators */
+.progress-vibe {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-vibe-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--vibe-gold), var(--vibe-gold-hover));
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* Premium notification styling */
+.notification-vibe {
+  background: rgba(246, 176, 18, 0.1);
+  border: 1px solid var(--vibe-gold);
+  border-radius: 0.75rem;
+  color: var(--vibe-white);
+  padding: 1rem;
+  backdrop-filter: none;
+}
+
+/* Premium modal styling */
+.modal-vibe {
+  background: var(--vibe-black);
+  border: 1px solid rgba(246, 176, 18, 0.3);
+  border-radius: 1.5rem;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+/* Remove all blur effects and transparency */
+* {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Ensure solid backgrounds only */
+.bg-opacity {
+  opacity: 1 !important;
+}
+
+/* Premium hover states */
+.hover-gold:hover {
+  color: var(--vibe-gold);
+  transition: color 0.2s ease;
+}
+
+.hover-gold-bg:hover {
+  background-color: rgba(246, 176, 18, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+/* Override text-transform for input fields */
+input, textarea {
+  text-transform: none;
+}
+
+/* Safe-area padding for status bar on mobile - only applies to native apps (APK) */
+.native-app .pt-safe {
+  padding-top: 30px;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #050505;
+}
+
+/* Hide scrollbar globally on all pages */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* Hide scrollbar for horizontal scroll containers */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Home playlist drag UX */
+.home-playlist-strip {
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+}
+
+.home-playlist-card {
+  scroll-snap-align: start;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  will-change: transform;
+}
+
+/* Touch-friendly – apply tap targets only to nav/page buttons, not player inline controls */
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Nav and standalone buttons get generous tap targets */
+.pb-32 button,
+.pb-32 a,
+nav button,
+nav a {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Player banner buttons use their own sizing */
+.player-banner button {
+  min-height: unset;
+  min-width: unset;
+}
+
+/* Disable pull-to-refresh on mobile */
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* Custom range slider styling (player progress bar) */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    #f6b012 0%,
+    #f6b012 var(--progress, 0%),
+    rgba(255, 255, 255, 0.1) var(--progress, 0%),
+    rgba(255, 255, 255, 0.1) 100%
+  );
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background: #f6b012;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  margin-top: -0.3125rem;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    #f6b012 0%,
+    #f6b012 var(--progress, 0%),
+    rgba(255, 255, 255, 0.1) var(--progress, 0%),
+    rgba(255, 255, 255, 0.1) 100%
+  );
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background: #f6b012;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+/* visual improvement: add shimmer keyframes for gold buttons */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.play-button-gold {
+  background: #f6b012;
+  box-shadow: none;
+  transition: transform 160ms cubic-bezier(.2,.9,.2,1);
+}
+
+.play-button-gold:hover,
+.play-button-gold:focus {
+  transform: translateY(-2px) scale(1.03);
+  animation-play-state: paused;
+}
+
+.play-button-gold:active {
+  transform: translateY(0) scale(0.99);
+}
+
+button.player-play-btn {
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-stagger {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* theme variables */
+:root {
+  --accent: #ffbb20;
+  --accent-hover: #ffd86a;
+  --surface-dark: #050505;
+  --search-bg: #111;
+}
+
+.text-vibe-gold {
+  color: var(--accent) !important;
+}
+
+.bg-vibe-gold {
+  background-color: var(--accent) !important;
+}
+
+.border-vibe-gold {
+  border-color: var(--accent) !important;
+}
+
+.ring-vibe-gold\/80 {
+  --tw-ring-color: rgba(246, 176, 18, 0.8) !important;
+}
+
+.bg-vibe-black {
+  background-color: var(--surface-dark) !important;
+}
+
+.text-vibe-black {
+  color: #050505 !important;
+}
+
+.search-opaque {
+  background-color: var(--search-bg) !important;
+  border-color: var(--accent) !important;
+  color: #ffffff !important;
+}
+
+.search-opaque::placeholder,
+.search-opaque::-webkit-input-placeholder,
+.search-opaque::-moz-placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.search-opaque:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px rgba(255, 187, 32, 0.25) !important;
+}
+
+/* Player banner base polish */
+.player-banner {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Player banner desktop - allow proper dimensions */
+@media (min-width: 768px) {
+  .player-banner {
+    overflow: visible;
+  }
+}
+
+/* Player banner specific styles - keep it compact */
+.player-banner input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0;
+  height: 0;
+  border: none;
+  background: transparent;
+}
+
+.player-banner input[type="range"]::-moz-range-thumb {
+  width: 0;
+  height: 0;
+  border: none;
+  background: transparent;
+}
+
+/* Control button baseline to keep consistent sizing, focus and transitions */
+.control-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 140ms, color 140ms, transform 140ms;
+  will-change: transform;
+}
+
+/* Range thumb improvements */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 9999px;
+  background: #f6b012;
+  border: 2px solid rgba(255,255,255,0.95);
+  margin-top: -0.34rem;
+  box-shadow: none;
+  transition: transform 120ms ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.12);
+  box-shadow: none;
+}
+
+input[type="range"]:focus::-webkit-slider-thumb {
+  box-shadow: none;
+}
+
+.fade-in-stagger:nth-child(odd) { animation-delay: 0.1s; }
+.fade-in-stagger:nth-child(even) { animation-delay: 0.2s; }
+
+/* micro-animations: subtle scales for touch feedback */
+.group-hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+.active\:scale-95:active {
+  transform: scale(0.95);
+}
+
+/* parallax lift on images/cards */
+.group-hover\:lift > * {
+  transform: translateY(-2px);
+}
+
+input[type="range"]::-ms-track {
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+input[type="range"]::-ms-fill-lower,
+input[type="range"]::-ms-fill-upper {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+
+input[type="range"]::-ms-thumb {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background: #f6b012;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Electron/Desktop AppImage specific sizing - larger UI elements */
+.electron body {
+  font-size: 16px;
+}
+
+.electron .player-banner {
+  min-height: 120px;
+}
+
+.electron .player-banner button,
+.electron .player-banner [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.electron .player-banner svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.electron .player-banner .text-sm {
+  font-size: 1rem;
+}
+
+.electron .player-banner .text-xs {
+  font-size: 0.875rem;
+}
+
+.electron .player-banner .text-\[10px\] {
+  font-size: 0.75rem;
+}
+
+/* Larger nav icons for desktop */
+.electron nav button svg,
+.electron nav a svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.electron nav span {
+  font-size: 0.875rem;
+}
+
+/* Force hide all scrollbars in Electron */
+.electron * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.electron *::-webkit-scrollbar {
+ width: 0 !important;
+ height: 0 !important;
+ display: none !important;
+}
+
+/* Multi-line text clamping for playlist/song titles (20 chars x 2 lines = 40 chars max) */
+.line-clamp-2 {
+ display: -webkit-box;
+ -webkit-line-clamp: 2;
+ line-clamp: 2;
+ -webkit-box-orient: vertical;
+ overflow: hidden;
+ word-break: break-word;
+}

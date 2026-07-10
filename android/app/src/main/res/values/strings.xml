@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Music</string>
+    <string name="title_activity_main">Music</string>
+    <string name="widget_name">Music Widget</string>
+    <string name="widget_description">Music player widget with player controls and lyrics</string>
+</resources>
