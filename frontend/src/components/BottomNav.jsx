@@ -1,16 +1,30 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
-  Home, Music, Heart, Clock, ListMusic, WifiOff, Zap, PlayCircle,
+  Home, Music, Heart, Clock, ListMusic, WifiOff, Zap,
   User, Disc3, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat,
-  Repeat1, MessageSquareText, Volume2, VolumeX, Download, Settings,
+  Repeat1, MessageSquareText, Volume2, VolumeX,
 } from '../icons.jsx';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { shallow } from 'zustand/shallow';
 import { usePlayerStore } from '../store';
 import { resolveMediaUrl } from '../api';
 import { triggerImpact } from '../utils/haptics';
 import { useDataSaver } from '../context/DataSaverContext';
 import AudioProcessingModal from './AudioProcessingModal';
-import { useProgressDrag, useProgressClick } from '../hooks/useProgressDrag';
+import { useProgressDrag } from '../hooks/useProgressDrag';
+
+// Live position/duration getters read straight from the store so the rAF
+// progress animation follows the <audio> element's currentTime at 60fps
+// (falling back to the store position on the native-playback path).
+const liveDuration = () => {
+  const s = usePlayerStore.getState();
+  return s.audioDuration || s.currentTrack?.duration || 0;
+};
+const livePosition = () => {
+  const s = usePlayerStore.getState();
+  const t = s.audioRef?.currentTime;
+  return Number.isFinite(t) ? t : s.currentPosition;
+};
 
 export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
   const location = useLocation();
@@ -65,7 +79,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
   toggleShuffle: state.toggleShuffle,
   toggleLyrics: state.toggleLyrics,
   toggleQueue: state.toggleQueue,
-  }));
+  }), shallow);
 
   const [pendingAction, setPendingAction] = useState(null);
   const [touchStartY, setTouchStartY] = useState(null);
@@ -98,79 +112,27 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
   const desktopFillRef = useRef(null);
   const desktopThumbRef = useRef(null);
 
-  const {
-    handleDragStart: handleDesktopDragStart,
-    handleDragMove: handleDesktopDragMove,
-    handleDragEnd: handleDesktopDragEnd,
-    attachMouseEvents: attachDesktopMouseEvents,
-    attachTouchEvents: attachDesktopTouchEvents,
-    isDraggingRef: isDesktopDraggingRef,
-    updateVisuals: updateDesktopVisuals,
-  } = useProgressDrag({
-    getDuration: () => duration,
-    getCurrentPosition: () => currentPosition,
+  const { onPointerDown: onDesktopPointerDown } = useProgressDrag({
+    getDuration: liveDuration,
+    getCurrentPosition: livePosition,
     onSeek: seekTo,
-    progressBarRef: desktopProgressBarRef,
+    trackRef: desktopProgressBarRef,
     fillRef: desktopFillRef,
     thumbRef: desktopThumbRef,
   });
-
-  const handleDesktopClick = useProgressClick({
-    getDuration: () => duration,
-    getCurrentPosition: () => currentPosition,
-    onSeek: seekTo,
-    progressBarRef: desktopProgressBarRef,
-  });
-
-  useEffect(() => {
-    if (desktopProgressBarRef.current) {
-      const cleanupMouse = attachDesktopMouseEvents(desktopProgressBarRef.current);
-      const cleanupTouch = attachDesktopTouchEvents(desktopProgressBarRef.current);
-      return () => {
-        cleanupMouse();
-        cleanupTouch();
-      };
-    }
-  }, [attachDesktopMouseEvents, attachDesktopTouchEvents]);
 
   const mobileProgressBarRef = useRef(null);
   const mobileFillRef = useRef(null);
   const mobileThumbRef = useRef(null);
 
-  const {
-    handleDragStart: handleMobileDragStart,
-    handleDragMove: handleMobileDragMove,
-    handleDragEnd: handleMobileDragEnd,
-    attachMouseEvents: attachMobileMouseEvents,
-    attachTouchEvents: attachMobileTouchEvents,
-    isDraggingRef: isMobileDraggingRef,
-    updateVisuals: updateMobileVisuals,
-  } = useProgressDrag({
-    getDuration: () => duration,
-    getCurrentPosition: () => currentPosition,
+  const { onPointerDown: onMobilePointerDown } = useProgressDrag({
+    getDuration: liveDuration,
+    getCurrentPosition: livePosition,
     onSeek: seekTo,
-    progressBarRef: mobileProgressBarRef,
+    trackRef: mobileProgressBarRef,
     fillRef: mobileFillRef,
     thumbRef: mobileThumbRef,
   });
-
-  const handleMobileClick = useProgressClick({
-    getDuration: () => duration,
-    getCurrentPosition: () => currentPosition,
-    onSeek: seekTo,
-    progressBarRef: mobileProgressBarRef,
-  });
-
-  useEffect(() => {
-    if (mobileProgressBarRef.current) {
-      const cleanupMouse = attachMobileMouseEvents(mobileProgressBarRef.current);
-      const cleanupTouch = attachMobileTouchEvents(mobileProgressBarRef.current);
-      return () => {
-        cleanupMouse();
-        cleanupTouch();
-      };
-    }
-  }, [attachMobileMouseEvents, attachMobileTouchEvents]);
 
   const formatTime = (s) => {
     if (!s || isNaN(s) || !isFinite(s)) return '0:00';
@@ -423,20 +385,21 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  <div className="flex items-center gap-2 flex-1 justify-center">
  <div className="flex items-center gap-2 w-full max-w-xs lg:max-w-sm">
  <span className="text-white/40 text-xs flex-shrink-0">{formatTime(currentPosition)}</span>
-<div 
+<div
     ref={desktopProgressBarRef}
     className="relative flex-1 h-1.5 bg-[#222] rounded-full cursor-pointer"
-    onClick={handleDesktopClick}
-    onMouseDown={(e) => handleDesktopDragStart(e.clientX)}
-    onTouchStart={(e) => handleDesktopDragStart(e.touches[0].clientX)}
+    style={{ touchAction: 'none' }}
+    onPointerDown={onDesktopPointerDown}
   >
-    <div 
+    <div
       ref={desktopFillRef}
       className="absolute left-0 top-0 bottom-0 bg-[#f6b012] rounded-full"
+      style={{ width: 0 }}
     />
-    <div 
+    <div
       ref={desktopThumbRef}
       className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
+      style={{ left: '-6px' }}
     />
   </div>
  <span className="text-white/40 text-xs flex-shrink-0">{formatTime(duration)}</span>
@@ -468,7 +431,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
        >
 {/* ===== MOBILE PLAYER STRIP (hidden on desktop) ===== */}
   {showPlayerControls && (
-  <div className="md:hidden flex-shrink-0">
+  <div className="md:hidden flex-shrink-0 mobile-player-strip">
  {/* Track info row - title and artist centered on screen */}
  <div className="relative flex items-center px-3 pt-0 pb-0" style={{ minHeight: '32px' }}>
  {/* Cover art - left side */}
@@ -496,8 +459,13 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  </div>
  </div>
 
-{/* Mobile controls - flex layout to prevent overlap */}
-  <div className="flex items-center justify-between px-4 py-2 mb-4" style={{ minHeight: '48px' }}>
+{/* Controls + progress live in a flex column. Flex `gap` never collapses,
+    so the fixed vertical gap between the controls row and the progress bar
+    is guaranteed regardless of button sizes — the play button can never
+    overlap the progress bar on any screen size. */}
+  <div className="flex flex-col gap-2 px-4 py-2">
+   {/* Controls row */}
+   <div className="flex items-center justify-between" style={{ minHeight: '48px' }}>
     {/* Left group: lyrics, repeat */}
    <div className="flex items-center gap-2">
      <button
@@ -518,7 +486,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
    </div>
 
    {/* Center group: previous, play/pause, next - flex layout */}
-   <div className="flex items-center justify-center gap-3">
+   <div className="flex items-center justify-center gap-3 flex-shrink-0">
      <button
      onClick={previousTrack}
      className="w-11 h-11 flex items-center justify-center text-white rounded-full active:scale-90 transition-none"
@@ -527,14 +495,14 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
      <SkipBack className="w-6 h-6 fill-current" />
      </button>
 
-<button
+     <button
       onClick={() => { triggerImpact('medium'); playPause(); }}
-      className="flex items-center justify-center bg-[#ffb10f] text-black rounded-full active:scale-90 transition-none player-play-btn w-6 h-6"
+      className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-[#ffb10f] text-black rounded-full active:scale-90 transition-none"
       aria-label={isPlaying ? 'pause' : 'play'}
       >
       {isPlaying
-      ? <Pause className="w-3.5 h-3.5 fill-current" />
-      : <Play className="w-3.5 h-3.5 fill-current" style={{ marginLeft: '1px' }} />
+      ? <Pause className="w-6 h-6 fill-current" />
+      : <Play className="w-6 h-6 fill-current" style={{ marginLeft: '2px' }} />
       }
       </button>
 
@@ -565,31 +533,33 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
      <ListMusic className="w-5 h-5" />
      </button>
    </div>
- </div>
+   </div>
 
-{/* Progress bar - div-based for better Android WebView support */}
-  <div className="mt-4">
+   {/* Progress bar - div-based for reliable Android WebView pointer handling */}
+   <div>
     <div
     ref={mobileProgressBarRef}
     className="w-full h-1.5 bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer relative"
-    onClick={handleMobileClick}
-    onMouseDown={(e) => handleMobileDragStart(e.clientX)}
-    onTouchStart={(e) => handleMobileDragStart(e.touches[0].clientX)}
+    style={{ touchAction: 'none' }}
+    onPointerDown={onMobilePointerDown}
   >
     {/* Progress fill bar */}
     <div
       ref={mobileFillRef}
       className="absolute left-0 top-0 bottom-0 bg-[#f6b012] rounded-full"
+      style={{ width: 0 }}
     />
     {/* Yellow thumb/circle indicator */}
     <div
       ref={mobileThumbRef}
       className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
+      style={{ left: '-6px' }}
     />
   </div>
   <div className="flex justify-between mt-1">
     <span className="text-white/40 text-[10px]">{formatTime(currentPosition)}</span>
     <span className="text-white/40 text-[10px]">{formatTime(duration)}</span>
+  </div>
   </div>
   </div>
   </div>

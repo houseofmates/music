@@ -1,174 +1,160 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { usePlayerStore } from '../store';
 
-export function useProgressDrag({ 
-  getDuration, 
+/**
+ * useProgressDrag — a single, shared progress-bar interaction hook used by every
+ * progress bar in the app (desktop bar, mobile strip, full-screen NowPlaying).
+ *
+ * Design guarantees:
+ *  - ONE implementation. No per-surface duplication.
+ *  - Pointer Events unify mouse + touch + pen. A single pointerdown handler is
+ *    attached to the track element; move/up/cancel listeners live on `window`
+ *    ONLY while a drag is active and are removed the instant it ends. When idle,
+ *    the hook attaches ZERO document/window listeners — so it can never break
+ *    page scrolling (the previous implementation attached a permanent
+ *    `document` touchmove listener that called preventDefault on every touch,
+ *    freezing all scrolling).
+ *  - During a drag the fill/thumb are written directly to the DOM via a cached
+ *    rect. No React state, no Zustand writes, no re-renders. The seek is applied
+ *    exactly once, atomically, on pointerup.
+ *  - Playback animates the fill at display refresh rate through a single
+ *    requestAnimationFrame loop reading a live position getter (the <audio>
+ *    element's currentTime when available), so the bar is smooth at ~60fps
+ *    without spamming state updates. The loop is skipped while dragging so
+ *    playback can never fight the finger.
+ */
+export function useProgressDrag({
+  getDuration,
   getCurrentPosition,
   onSeek,
-  progressBarRef,
+  trackRef,
+  fillRef,
   thumbRef,
-  fillRef 
 }) {
-  const isDraggingRef = useRef(false);
-  const pendingSeekRef = useRef(null);
-  const animationFrameRef = useRef(null);
-  const durationRef = useRef(0);
+  const draggingRef = useRef(false);
   const rectRef = useRef(null);
-  const dragOriginRef = useRef(0);
-  
-  const storeSetIsDragging = usePlayerStore((state) => state.setIsDraggingProgress);
+  const pendingSeekRef = useRef(null);
+  const activePointerRef = useRef(null);
+  const rafRef = useRef(0);
 
-  const updateVisuals = useCallback((position) => {
-    const duration = durationRef.current;
+  // Latest getters/callbacks held in refs so the rAF loop and the (stable)
+  // pointer handlers always read fresh values without re-subscribing.
+  const getDurationRef = useRef(getDuration);
+  const getPositionRef = useRef(getCurrentPosition);
+  const onSeekRef = useRef(onSeek);
+  getDurationRef.current = getDuration;
+  getPositionRef.current = getCurrentPosition;
+  onSeekRef.current = onSeek;
+
+  const setStoreDragging = usePlayerStore((s) => s.setIsDraggingProgress);
+
+  // Paint fill width + thumb position. Thumb is 12px (w-3); offset by half so it
+  // centres on the value. Pure DOM writes — never touches React.
+  const paint = useCallback((position, duration) => {
     if (!duration || duration <= 0) return;
-    
     const percent = Math.max(0, Math.min(100, (position / duration) * 100));
-    
-    if (fillRef.current) {
-      fillRef.current.style.width = `${percent}%`;
-    }
-    if (thumbRef.current) {
-      thumbRef.current.style.left = `calc(${percent}% - 6px)`;
-    }
-  }, []);
+    const fill = fillRef.current;
+    const thumb = thumbRef.current;
+    if (fill) fill.style.width = `${percent}%`;
+    if (thumb) thumb.style.left = `calc(${percent}% - 6px)`;
+  }, [fillRef, thumbRef]);
 
-  const handleDragStart = useCallback((clientX) => {
-    if (isDraggingRef.current) return;
-    
-    const progressBar = progressBarRef.current;
-    if (!progressBar) return;
-    
-    // Cache rect once at drag start
-    rectRef.current = progressBar.getBoundingClientRect();
-    if (rectRef.current.width === 0) return;
-    
-    dragOriginRef.current = clientX - rectRef.current.left;
-    isDraggingRef.current = true;
-    storeSetIsDragging(true);
-    
-    // Add dragging class to disable CSS transitions
-    progressBar.classList.add('progress-dragging');
-    
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-    }
-  }, [storeSetIsDragging]);
-
-  const handleDragMove = useCallback((clientX) => {
-    if (!isDraggingRef.current || !rectRef.current) return;
-    
+  const percentFromClientX = (clientX) => {
     const rect = rectRef.current;
-    const localX = clientX - rect.left;
-    const percent = Math.max(0, Math.min(1, localX / rect.width));
-    const duration = durationRef.current;
-    if (!duration || duration <= 0) return;
-    
-    const newPosition = percent * duration;
-    pendingSeekRef.current = newPosition;
-    
-    // Update visuals immediately (synchronously)
-    updateVisuals(newPosition);
-    
-    // Do NOT call storeSetCurrentPosition during drag - it triggers React re-renders
-  }, [updateVisuals]);
+    if (!rect || rect.width === 0) return null;
+    return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+  };
 
-  const handleDragEnd = useCallback(() => {
-    if (!isDraggingRef.current) return;
-    isDraggingRef.current = false;
-    storeSetIsDragging(false);
-    
-    const progressBar = progressBarRef.current;
-    if (progressBar) {
-      progressBar.classList.remove('progress-dragging');
-    }
-    
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
+  const handlePointerMove = useCallback((e) => {
+    if (!draggingRef.current) return;
+    if (activePointerRef.current != null && e.pointerId !== activePointerRef.current) return;
+    // Only meaningful while dragging — safe to prevent scroll/selection here.
+    if (e.cancelable) e.preventDefault();
+    const pct = percentFromClientX(e.clientX);
+    if (pct == null) return;
+    const duration = getDurationRef.current() || 0;
+    const pos = pct * duration;
+    pendingSeekRef.current = pos;
+    paint(pos, duration);
+  }, [paint]);
+
+  const endDrag = useCallback(() => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    activePointerRef.current = null;
+    setStoreDragging(false);
+
+    const track = trackRef.current;
+    if (track) track.classList.remove('progress-dragging');
+
+    window.removeEventListener('pointermove', handlePointerMove);
+    window.removeEventListener('pointerup', endDrag);
+    window.removeEventListener('pointercancel', endDrag);
+
     rectRef.current = null;
-    
     const target = pendingSeekRef.current;
     pendingSeekRef.current = null;
-    
     if (target != null && Number.isFinite(target)) {
-      onSeek(target);
+      onSeekRef.current(target);
     }
-  }, [storeSetIsDragging, onSeek]);
+  }, [handlePointerMove, setStoreDragging, trackRef]);
 
-  const syncFromPlayback = useCallback(() => {
-    if (isDraggingRef.current) return;
-    
-    const duration = getDuration();
-    const position = getCurrentPosition();
-    
-    durationRef.current = duration;
-    
-    if (duration > 0 && position >= 0) {
-      updateVisuals(position);
-    }
-  }, [getDuration, getCurrentPosition, updateVisuals]);
+  // The ONLY handler a component attaches. Handles a plain tap (press → release
+  // seeks to the press point) and a drag (press → move → release) with one path.
+  const handlePointerDown = useCallback((e) => {
+    if (e.button != null && e.button > 0) return; // ignore right/middle click
+    const track = trackRef.current;
+    if (!track) return;
+    const rect = track.getBoundingClientRect();
+    if (rect.width === 0) return;
 
+    rectRef.current = rect;
+    activePointerRef.current = e.pointerId;
+    draggingRef.current = true;
+    setStoreDragging(true);
+    track.classList.add('progress-dragging');
+
+    // Jump immediately to the press location for a responsive tap-to-seek feel.
+    const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const duration = getDurationRef.current() || 0;
+    const pos = pct * duration;
+    pendingSeekRef.current = pos;
+    paint(pos, duration);
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: false });
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
+    if (e.cancelable) e.preventDefault();
+  }, [trackRef, paint, handlePointerMove, endDrag, setStoreDragging]);
+
+  // Smooth playback animation: one rAF loop for the lifetime of the hook.
+  // Reads the live position getter every frame; skipped while dragging.
   useEffect(() => {
-    const interval = setInterval(syncFromPlayback, 500);
-    syncFromPlayback();
-    return () => clearInterval(interval);
-  }, [syncFromPlayback]);
-
-  const attachMouseEvents = useCallback((element) => {
-    const onMouseMove = (e) => {
-      e.preventDefault();
-      handleDragMove(e.clientX);
+    let stopped = false;
+    const tick = () => {
+      if (stopped) return;
+      if (!draggingRef.current) {
+        const duration = getDurationRef.current() || 0;
+        const pos = getPositionRef.current();
+        if (duration > 0 && Number.isFinite(pos) && pos >= 0) {
+          paint(pos, duration);
+        }
+      }
+      rafRef.current = requestAnimationFrame(tick);
     };
-    const onMouseUp = () => handleDragEnd();
-    
-    document.addEventListener('mousemove', onMouseMove, { passive: false });
-    document.addEventListener('mouseup', onMouseUp);
-    
+    rafRef.current = requestAnimationFrame(tick);
     return () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
+      stopped = true;
+      cancelAnimationFrame(rafRef.current);
     };
-  }, [handleDragMove, handleDragEnd]);
+  }, [paint]);
 
-  const attachTouchEvents = useCallback((element) => {
-    const onTouchMove = (e) => {
-      e.preventDefault();
-      const touch = e.touches[0];
-      if (touch) handleDragMove(touch.clientX);
-    };
-    const onTouchEnd = () => handleDragEnd();
-    
-    document.addEventListener('touchmove', onTouchMove, { passive: false });
-    document.addEventListener('touchend', onTouchEnd);
-    document.addEventListener('touchcancel', onTouchEnd);
-    
-    return () => {
-      document.removeEventListener('touchmove', onTouchMove);
-      document.removeEventListener('touchend', onTouchEnd);
-      document.removeEventListener('touchcancel', onTouchEnd);
-    };
-  }, [handleDragMove, handleDragEnd]);
+  // Safety net: if the component unmounts mid-drag, tear down window listeners.
+  useEffect(() => () => {
+    window.removeEventListener('pointermove', handlePointerMove);
+    window.removeEventListener('pointerup', endDrag);
+    window.removeEventListener('pointercancel', endDrag);
+  }, [handlePointerMove, endDrag]);
 
-  return {
-    handleDragStart,
-    handleDragMove,
-    handleDragEnd,
-    attachMouseEvents,
-    attachTouchEvents,
-    isDraggingRef,
-    pendingSeekRef,
-    updateVisuals,
-  };
-}
-
-export function useProgressClick({ getDuration, getCurrentPosition, onSeek, progressBarRef }) {
-  return useCallback((e) => {
-    const duration = getDuration();
-    if (!duration || !progressBarRef.current) return;
-    
-    const rect = progressBarRef.current.getBoundingClientRect();
-    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    onSeek(percent * duration);
-  }, [getDuration, onSeek, progressBarRef]);
+  return { onPointerDown: handlePointerDown, isDraggingRef: draggingRef };
 }
