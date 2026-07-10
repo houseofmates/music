@@ -440,9 +440,21 @@ input[type="range"]::-moz-range-thumb {
   transform: translateY(0) scale(0.99);
 }
 
-button.player-play-btn {
-  min-width: 0 !important;
-  min-height: 0 !important;
+/*
+ * ROOT-CAUSE FIX for the play/pause button overlap.
+ *
+ * The mobile player strip is rendered INSIDE the <nav> element, so the global
+ * rule `nav button { min-width:44px; min-height:44px }` above was silently
+ * forcing every control (including the play button) to at least 44px, ignoring
+ * its Tailwind size. Previous attempts fought this by shrinking the button and
+ * slapping `!important` on a single element, which only produced an
+ * inconsistent, mis-sized button. Instead we opt the whole strip out of the
+ * nav min-size rule so each control renders at its intended Tailwind size.
+ */
+.mobile-player-strip button,
+.mobile-player-strip a {
+  min-width: 0;
+  min-height: 0;
 }
 
 @keyframes fadeInUp {

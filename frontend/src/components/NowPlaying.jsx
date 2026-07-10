@@ -16,12 +16,25 @@ import {
   VolumeX,
   Keyboard
 } from "../icons.jsx";
+import { shallow } from "zustand/shallow";
 import ImageWithFallback from "./ImageWithFallback";
 import LyricsPanel from "./LyricsPanel";
 import EnhancedMetadataPanel from "./EnhancedMetadataPanel";
 import { resolveMediaUrl } from "../api.js";
 import { triggerImpact } from "../utils/haptics";
-import { useProgressDrag, useProgressClick } from "../hooks/useProgressDrag";
+import { useProgressDrag } from "../hooks/useProgressDrag";
+
+// Live getters so the progress fill animates from the <audio> element's
+// currentTime at 60fps (native path falls back to the store position).
+const liveDuration = () => {
+  const s = usePlayerStore.getState();
+  return s.audioDuration || s.currentTrack?.duration || 0;
+};
+const livePosition = () => {
+  const s = usePlayerStore.getState();
+  const t = s.audioRef?.currentTime;
+  return Number.isFinite(t) ? t : s.currentPosition;
+};
 
 function AudioVisualizer({ audio, isPlaying }) {
   const canvasRef = useRef(null);
@@ -181,7 +194,29 @@ export default function NowPlaying({ onClose }) {
     audioRef,
     volume,
     setVolume,
-  } = usePlayerStore();
+  } = usePlayerStore((s) => ({
+    currentTrack: s.currentTrack,
+    isPlaying: s.isPlaying,
+    currentPosition: s.currentPosition,
+    audioDuration: s.audioDuration,
+    repeatMode: s.repeatMode,
+    shuffle: s.shuffle,
+    showLyrics: s.showLyrics,
+    favorites: s.favorites,
+    queue: s.queue,
+    currentQueueIndex: s.currentQueueIndex,
+    playPause: s.playPause,
+    nextTrack: s.nextTrack,
+    previousTrack: s.previousTrack,
+    seekTo: s.seekTo,
+    setRepeatMode: s.setRepeatMode,
+    toggleShuffle: s.toggleShuffle,
+    toggleLyrics: s.toggleLyrics,
+    toggleFavorite: s.toggleFavorite,
+    audioRef: s.audioRef,
+    volume: s.volume,
+    setVolume: s.setVolume,
+  }), shallow);
 
   const [showQueue, setShowQueue] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -234,45 +269,18 @@ export default function NowPlaying({ onClose }) {
 
   const duration = audioDuration || currentTrack?.duration || 0;
 
-  const progressBarRef = useRef(null);
+  const trackRef = useRef(null);
   const fillRef = useRef(null);
   const thumbRef = useRef(null);
 
-  const {
-    handleDragStart,
-    handleDragMove,
-    handleDragEnd,
-    attachMouseEvents,
-    attachTouchEvents,
-    isDraggingRef,
-    pendingSeekRef,
-    currentPositionRef,
-    durationRef,
-    updateVisuals,
-  } = useProgressDrag({
-    getDuration: () => duration,
-    getCurrentPosition: () => currentPosition,
+  const { onPointerDown } = useProgressDrag({
+    getDuration: liveDuration,
+    getCurrentPosition: livePosition,
     onSeek: seekTo,
-    progressBarRef,
+    trackRef,
     fillRef,
     thumbRef,
   });
-
-  const handleProgressClick = useProgressClick({
-    getDuration: () => duration,
-    getCurrentPosition: () => currentPosition,
-    onSeek: seekTo,
-    progressBarRef,
-  });
-
-  useEffect(() => {
-    const cleanupMouse = attachMouseEvents(progressBarRef.current);
-    const cleanupTouch = attachTouchEvents(progressBarRef.current);
-    return () => {
-      cleanupMouse();
-      cleanupTouch();
-    };
-  }, [attachMouseEvents, attachTouchEvents]);
 
   const handleVolumeChange = (e) => {
     e.stopPropagation();
@@ -420,12 +428,13 @@ export default function NowPlaying({ onClose }) {
               triggerImpact("medium");
               playPause();
             }}
-            className="p-1 rounded-full bg-[#f6b012] text-black hover:bg-[#ffcc40] transition-colors player-play-btn"
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-[#f6b012] text-black hover:bg-[#ffcc40] transition-colors"
+            aria-label={isPlaying ? "pause" : "play"}
           >
             {isPlaying ? (
-              <Pause className="w-5 h-5 fill-current" />
+              <Pause className="w-6 h-6 fill-current" />
             ) : (
-              <Play className="w-5 h-5 fill-current pl-0.5" />
+              <Play className="w-6 h-6 fill-current pl-0.5" />
             )}
           </button>
 
@@ -477,25 +486,28 @@ export default function NowPlaying({ onClose }) {
           </div>
         </div>
 
-        {/* progress bar row */}
-        <div 
-          ref={progressBarRef}
-          className="flex items-center gap-2 w-full max-w-[280px] select-none shrink-0"
-        >
+        {/* progress bar row — the ref/handler go on the TRACK element itself so
+            the pointer maths use the same box the fill/thumb are positioned in.
+            (Previously the ref was on this outer flex row, which includes the
+            two time labels, so the drag geometry never matched the visible bar
+            and the thumb did not follow the finger.) */}
+        <div className="flex items-center gap-2 w-full max-w-[280px] select-none shrink-0">
           <span className="text-xs text-white/60 w-10 text-right">{formatTime(currentPosition)}</span>
-          <div 
-            className={`flex-1 h-1.5 bg-[#222] rounded-full relative overflow-hidden cursor-pointer`}
-            onClick={handleProgressClick}
-            onMouseDown={(e) => handleDragStart(e.clientX)}
-            onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
+          <div
+            ref={trackRef}
+            className={`flex-1 h-1.5 bg-[#222] rounded-full relative cursor-pointer`}
+            style={{ touchAction: 'none' }}
+            onPointerDown={onPointerDown}
           >
-            <div 
+            <div
               ref={fillRef}
               className="absolute left-0 top-0 bottom-0 bg-[#f6b012] rounded-full"
+              style={{ width: 0 }}
             />
-            <div 
+            <div
               ref={thumbRef}
               className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
+              style={{ left: '-6px' }}
             />
           </div>
           <span className="text-xs text-white/60 w-10">{formatTime(duration)}</span>
