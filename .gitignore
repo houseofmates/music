@@ -67,3 +67,12 @@ releases/
 
 # Temporary git staging artifacts (handles nested repo migrations)
 .*.hidden
+
+# Large binaries / build artifacts
+frontend/release/
+backend.backup/music.db*
+backend.backup/*.db
+
+# Old nested repo snapshots
+backend.backup/
+test-repo/
