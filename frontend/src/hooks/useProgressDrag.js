@@ -30,6 +30,7 @@ export function useProgressDrag({
   trackRef,
   fillRef,
   thumbRef,
+  enabled = true,
 }) {
   const draggingRef = useRef(false);
   const rectRef = useRef(null);
@@ -102,6 +103,7 @@ export function useProgressDrag({
   // The ONLY handler a component attaches. Handles a plain tap (press → release
   // seeks to the press point) and a drag (press → move → release) with one path.
   const handlePointerDown = useCallback((e) => {
+    if (!enabled) return;
     if (e.button != null && e.button > 0) return; // ignore right/middle click
     const track = trackRef.current;
     if (!track) return;
@@ -125,11 +127,19 @@ export function useProgressDrag({
     window.addEventListener('pointerup', endDrag);
     window.addEventListener('pointercancel', endDrag);
     if (e.cancelable) e.preventDefault();
-  }, [trackRef, paint, handlePointerMove, endDrag, setStoreDragging]);
+  }, [enabled, trackRef, paint, handlePointerMove, endDrag, setStoreDragging]);
 
   // Smooth playback animation: one rAF loop for the lifetime of the hook.
   // Reads the live position getter every frame; skipped while dragging.
   useEffect(() => {
+    if (!enabled) {
+      cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', endDrag);
+      window.removeEventListener('pointercancel', endDrag);
+      return undefined;
+    }
+
     let stopped = false;
     const tick = () => {
       if (stopped) return;
@@ -147,7 +157,7 @@ export function useProgressDrag({
       stopped = true;
       cancelAnimationFrame(rafRef.current);
     };
-  }, [paint]);
+  }, [enabled, paint, handlePointerMove, endDrag]);
 
   // Safety net: if the component unmounts mid-drag, tear down window listeners.
   useEffect(() => () => {

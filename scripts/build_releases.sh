@@ -90,7 +90,8 @@ if [ -d "frontend" ]; then
   echo "Frontend build completed"
 
   if [ -f capacitor.config.json ]; then
-    jq 'del(.server.hostname)' capacitor.config.json > tmp.json && mv tmp.json capacitor.config.json
+    # Set the hostname to the production URL for the release build
+    jq '.server.hostname = "music.houseofmates.space"' capacitor.config.json > tmp.json && mv tmp.json capacitor.config.json
   fi
   popd > /dev/null
 
@@ -98,9 +99,10 @@ if [ -d "frontend" ]; then
 
   if [ -d "android" ]; then
     echo "Copying web assets into android project"
-    mkdir -p android/app/src/main/assets/public
-    cp -r frontend/dist/* android/app/src/main/assets/public/ || echo "WARNING: failed to copy dist files"
-    cp frontend/capacitor.config.json android/app/src/main/assets/ || echo "WARNING: failed to copy capacitor config"
+    rm -rf android/app/src/main/assets
+    mkdir -p android/app/src/main/assets/dist
+    cp -r frontend/dist/* android/app/src/main/assets/dist/ || { echo "ERROR: failed to copy dist files"; exit 1; }
+    cp frontend/capacitor.config.json android/app/src/main/assets/ || { echo "ERROR: failed to copy capacitor config"; exit 1; }
   fi
 else
   FRONTEND_BUILT=false
@@ -183,7 +185,7 @@ XML
     fi
     rm -f app/src/main/res/drawable/splash_icon.png
 
-    ./gradlew assembleRelease || echo "WARNING: Gradle build failed"
+    ./gradlew assembleRelease || { echo "ERROR: Gradle build failed"; exit 1; }
 
     # check both signed and unsigned APK paths
     APK_PATH="$(pwd)/app/build/outputs/apk/release/app-release.apk"

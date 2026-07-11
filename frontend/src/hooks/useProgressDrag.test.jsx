@@ -14,7 +14,7 @@ vi.mock('../store', () => ({
 
 const DURATION = 100;
 
-function Harness({ onSeek }) {
+function Harness({ onSeek, enabled = true }) {
   const trackRef = useRef(null);
   const fillRef = useRef(null);
   const thumbRef = useRef(null);
@@ -25,6 +25,7 @@ function Harness({ onSeek }) {
     trackRef,
     fillRef,
     thumbRef,
+    enabled,
   });
   return (
     <div data-testid="track" ref={trackRef} onPointerDown={onPointerDown}>
@@ -103,5 +104,20 @@ describe('useProgressDrag', () => {
       ([type]) => type === 'pointermove' || type === 'touchmove'
     );
     expect(moveListeners).toHaveLength(0);
+  });
+
+  it('stays dormant when disabled', () => {
+    const onSeek = vi.fn();
+    const raf = typeof window.requestAnimationFrame === 'function'
+      ? vi.spyOn(window, 'requestAnimationFrame')
+      : null;
+    const add = vi.spyOn(window, 'addEventListener');
+    const { getByTestId } = render(<Harness onSeek={onSeek} enabled={false} />);
+
+    fireEvent.pointerDown(getByTestId('track'), { clientX: 0, pointerId: 1, button: 0 });
+
+    if (raf) expect(raf).not.toHaveBeenCalled();
+    expect(add.mock.calls.some(([type]) => type === 'pointermove')).toBe(false);
+    expect(onSeek).not.toHaveBeenCalled();
   });
 });

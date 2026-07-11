@@ -30,6 +30,10 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
   const location = useLocation();
   const navigate = useNavigate();
   const dataSaver = useDataSaver();
+  const isDesktopViewport =
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(min-width: 768px)').matches;
   const volumeContainerRef = useRef(null);
   const volumeSliderRef = useRef(null);
 
@@ -119,6 +123,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     trackRef: desktopProgressBarRef,
     fillRef: desktopFillRef,
     thumbRef: desktopThumbRef,
+    enabled: isPlayerHidden && isDesktopViewport,
   });
 
   const mobileProgressBarRef = useRef(null);
@@ -132,6 +137,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     trackRef: mobileProgressBarRef,
     fillRef: mobileFillRef,
     thumbRef: mobileThumbRef,
+    enabled: isPlayerHidden && !isDesktopViewport,
   });
 
   const formatTime = (s) => {
@@ -253,7 +259,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
 {/* ===== DESKTOP ONLY: Player bar ABOVE the nav bar ===== */}
  <div
  className="hidden md:grid fixed bottom-14 xl:bottom-16 left-0 right-0 bg-[#050505] border-t border-[#f6b012] items-center h-14 xl:h-16 z-40 px-4"
- style={{ fontFamily: '"Varela Round", sans-serif', gridTemplateColumns: '1fr auto 1fr' }}
+ style={{ fontFamily: '"Varela Round", sans-serif', gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr)' }}
  >
  {/* Left: track title */}
  <div className="flex items-center gap-3 min-w-0" style={{ minWidth: '200px' }}>

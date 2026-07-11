@@ -6,10 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     androidScheme: 'https',
-    hostname: 'music.houseofmates.space',
-    cleartext: false,
-    // For production, point to your backend
-    url: 'https://music.houseofmates.space'
+    cleartext: true
   },
   android: {
     buildOptions: {

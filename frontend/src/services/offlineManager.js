@@ -34,6 +34,9 @@ export class OfflineManager {
   }
 
   async initIndexedDB() {
+    if (typeof indexedDB === 'undefined') {
+      return Promise.resolve();
+    }
     return new Promise((resolve, reject) => {
       const request = indexedDB.open('music-offline-db', 1);
       request.onupgradeneeded = (e) => {
