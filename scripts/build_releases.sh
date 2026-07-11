@@ -99,9 +99,9 @@ if [ -d "frontend" ]; then
 
   if [ -d "android" ]; then
     echo "Copying web assets into android project"
-    rm -rf android/app/src/main/assets
-    mkdir -p android/app/src/main/assets/dist
-    cp -r frontend/dist/* android/app/src/main/assets/dist/ || { echo "ERROR: failed to copy dist files"; exit 1; }
+    rm -rf android/app/src/main/assets/public
+    mkdir -p android/app/src/main/assets/public
+    cp -r frontend/dist/* android/app/src/main/assets/public/ || { echo "error: failed to copy dist files"; exit 1; }
     cp frontend/capacitor.config.json android/app/src/main/assets/ || { echo "ERROR: failed to copy capacitor config"; exit 1; }
   fi
 else
