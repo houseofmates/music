@@ -37,7 +37,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@types/annyang": "^2.6.0",
     "annyang": "^3.0.0",
-    "axios": "^1.6.5",
+    "axios": "^1.18.1",
     "cordova-plugin-background-mode": "^0.7.3",
     "cordova-plugin-device": "^3.0.0",
     "lucide-react": "^0.312.0",
