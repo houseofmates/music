@@ -749,7 +749,7 @@ input[type="range"]::-ms-thumb {
 }
 
 /* Safe area insets for native mobile — placed after @tailwind utilities so they override py-* etc. */
-.pt-safe { padding-top: env(safe-area-inset-top, 8px); }
+.pt-safe { padding-top: env(safe-area-inset-top, 0px); }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
 
 /* Mobile-only horizontal overflow guard */
