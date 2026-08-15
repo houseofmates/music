@@ -442,15 +442,14 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
          style={{ fontFamily: '"Varela Round", sans-serif' }}
        >
 {/* ===== MOBILE PLAYER STRIP (hidden on desktop) ===== */}
-  {showPlayerControls && (
-  <div className="md:hidden flex-shrink-0 mobile-player-strip">
+  <div className={`md:hidden flex-shrink-0 mobile-player-strip ${showPlayerControls ? '' : 'hidden'}`}>
  {/* Track info row - title and artist centered on screen */}
  <div className="relative flex items-center px-2 pt-0 pb-0" style={{ minHeight: '24px' }}>
  {/* Cover art - left side */}
- {currentTrack.cover_art_url ? (
+ {currentTrack?.cover_art_url ? (
  <img
  src={resolveMediaUrl(currentTrack.cover_art_url)}
- alt={currentTrack.album || currentTrack.title}
+ alt={currentTrack?.album || currentTrack?.title}
  className="w-7 h-7 rounded-lg object-cover flex-shrink-0"
  />
  ) : (
