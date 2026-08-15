@@ -760,15 +760,8 @@ input[type="range"]::-ms-thumb {
   .native-app { overflow-x: hidden; }
 }
 
-/* Remove any visible border/outline from the bottom player strip and nav */
-nav, .mobile-player-strip {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
 /* Eliminate any visible outline around the bottom player strip / nav */
-nav, .mobile-player-strip, .mobile-player-strip > div {
+.mobile-player-strip, .mobile-player-strip > div {
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
