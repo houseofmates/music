@@ -482,9 +482,9 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     so the fixed vertical gap between the controls row and the progress bar
     is guaranteed regardless of button sizes — the play button can never
     overlap the progress bar on any screen size. */}
-  <div className="flex flex-col gap-0.5 px-2 py-0">
+  <div className="flex flex-col gap-0 px-2 py-0">
    {/* Controls row */}
-   <div className="flex items-center justify-center gap-1" style={{ minHeight: '2rem' }}>
+   <div className="flex items-center justify-center gap-1" style={{ minHeight: '1.5rem' }}>
     {/* Left group: lyrics, repeat */}
    <div className="flex items-center gap-1">
      <button
