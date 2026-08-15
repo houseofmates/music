@@ -119,33 +119,40 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     }
   };
 
-  const desktopProgressBarRef = useRef(null);
-  const desktopFillRef = useRef(null);
-  const desktopThumbRef = useRef(null);
+  const desktopRangeRef = useRef(null);
+  const desktopInteractingRef = useRef(false);
 
-  const { isDraggingRef: _desktopDraggingRef } = useProgressDrag({
-    getDuration: liveDuration,
-    getCurrentPosition: livePosition,
-    onSeek: seekTo,
-    trackRef: desktopProgressBarRef,
-    fillRef: desktopFillRef,
-    thumbRef: desktopThumbRef,
-    enabled: !isPlayerHidden && isDesktopViewport,
-  });
+  const mobileRangeRef = useRef(null);
+  const mobileInteractingRef = useRef(false);
 
-  const mobileProgressBarRef = useRef(null);
-  const mobileFillRef = useRef(null);
-  const mobileThumbRef = useRef(null);
+  // rAF loop: updates the --progress CSS variable on both range inputs
+  // so the fill follows playback at 60fps. Skips updates while the user
+  // is dragging so the thumb doesn't fight the finger.
+  useEffect(() => {
+    const desktop = desktopRangeRef.current;
+    const mobile = mobileRangeRef.current;
+    if (!desktop && !mobile) return;
 
-  const { isDraggingRef: _mobileDraggingRef } = useProgressDrag({
-    getDuration: liveDuration,
-    getCurrentPosition: livePosition,
-    onSeek: seekTo,
-    trackRef: mobileProgressBarRef,
-    fillRef: mobileFillRef,
-    thumbRef: mobileThumbRef,
-    enabled: !isPlayerHidden && !isDesktopViewport,
-  });
+    let raf;
+    const tick = () => {
+      const duration = liveDuration();
+      if (duration > 0) {
+        const pos = livePosition();
+        const pct = Math.max(0, Math.min(100, (pos / duration) * 100));
+        if (desktop && !desktopInteractingRef.current) {
+          desktop.value = pct;
+          desktop.style.setProperty('--progress', pct + '%');
+        }
+        if (mobile && !mobileInteractingRef.current) {
+          mobile.value = pct;
+          mobile.style.setProperty('--progress', pct + '%');
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   const formatTime = (s) => {
     if (!s || isNaN(s) || !isFinite(s)) return '0:00';
