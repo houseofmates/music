@@ -144,17 +144,26 @@ public class MainActivity extends BridgeActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                // Block localhost/127.0.0.1 navigation that breaks the app
-                if (url != null && (url.startsWith("http://localhost") || url.startsWith("http://127.0.0.1"))) {
-                    return true;
-                }
-                return false;
+                // Only allow file:// and the production server.
+                // Block everything else (localhost, 127.0.0.1, http://, https://)
+                // to prevent the app from navigating away from bundled assets.
+                if (url == null) return true;
+                if (url.startsWith("file://")) return false;
+                if (url.startsWith("https://music.houseofmates.space")) return false;
+                
+                // Block any other URL and reload local assets
+                view.loadUrl("file:///android_asset/public/index.html");
+                return true;
             }
 
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                // If we get an error loading a non-file URL, reload local assets
+                if (failingUrl != null && !failingUrl.startsWith("file://")) {
+                    view.loadUrl("file:///android_asset/public/index.html");
+                    return;
+                }
                 super.onReceivedError(view, errorCode, description, failingUrl);
-                // Don't crash on web errors
             }
         });
         
