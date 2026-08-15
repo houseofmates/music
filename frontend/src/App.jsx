@@ -240,6 +240,7 @@ const handleSwipeBack = useCallback(() => {
     window.addEventListener('keydown', handleKeys);
 
     return () => {
+      clearTimeout(timeout);
       mediaQuery.removeEventListener('change', handleViewport);
       viewport?.removeEventListener('resize', handleKeyboard);
       viewport?.removeEventListener('scroll', handleKeyboard);
