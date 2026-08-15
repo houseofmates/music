@@ -142,6 +142,27 @@ public class MainActivity extends BridgeActivity {
         
         // Prevent WebView from being destroyed during config changes
         webView.setWebViewClient(new WebViewClient() {
+            private boolean isRedirecting = false;
+            
+            @Override
+            public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
+                // If the WebView navigates away from local assets (e.g. Capacitor
+                // or react-router tries to load http://localhost after startup),
+                // immediately cancel the load and return to the bundled index.html.
+                if (url != null && !url.startsWith("file://") && !url.startsWith("https://music.houseofmates.space")) {
+                    if (!isRedirecting) {
+                        isRedirecting = true;
+                        view.stopLoading();
+                        view.loadUrl("file:///android_asset/public/index.html");
+                        // Reset flag after a short delay to allow the reload to complete
+                        view.postDelayed(() -> isRedirecting = false, 1000);
+                    }
+                    return;
+                }
+                isRedirecting = false;
+                super.onPageStarted(view, url, favicon);
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 // Only allow file:// and the production server.
