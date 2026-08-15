@@ -90,8 +90,8 @@ if [ -d "frontend" ]; then
   echo "Frontend build completed"
 
   if [ -f capacitor.config.json ]; then
-    # Set the hostname to the production URL for the release build
-    jq '.server.hostname = "music.houseofmates.space"' capacitor.config.json > tmp.json && mv tmp.json capacitor.config.json
+    # Ensure no remote server hostname is set for release builds
+    jq 'del(.server.hostname)' capacitor.config.json > tmp.json && mv tmp.json capacitor.config.json
   fi
   popd > /dev/null
 
@@ -101,7 +101,7 @@ if [ -d "frontend" ]; then
     echo "Copying web assets into android project"
     rm -rf android/app/src/main/assets/public
     mkdir -p android/app/src/main/assets/public
-    cp -r frontend/dist/* android/app/src/main/assets/public/ || { echo "error: failed to copy dist files"; exit 1; }
+    cp -r frontend/dist/* android/app/src/main/assets/public/ || { echo "ERROR: failed to copy dist files"; exit 1; }
     cp frontend/capacitor.config.json android/app/src/main/assets/ || { echo "ERROR: failed to copy capacitor config"; exit 1; }
   fi
 else

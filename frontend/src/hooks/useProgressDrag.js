@@ -37,6 +37,7 @@ export function useProgressDrag({
   const pendingSeekRef = useRef(null);
   const activePointerRef = useRef(null);
   const rafRef = useRef(0);
+  const lastPaintedPercentRef = useRef(-1);
 
   // Latest getters/callbacks held in refs so the rAF loop and the (stable)
   // pointer handlers always read fresh values without re-subscribing.
@@ -49,15 +50,17 @@ export function useProgressDrag({
 
   const setStoreDragging = usePlayerStore((s) => s.setIsDraggingProgress);
 
-  // Paint fill width + thumb position. Thumb is 12px (w-3); offset by half so it
-  // centres on the value. Pure DOM writes — never touches React.
-  const paint = useCallback((position, duration) => {
+  // Track last painted percent to avoid redundant DOM writes
+  const paintThrottled = useCallback((position, duration) => {
     if (!duration || duration <= 0) return;
     const percent = Math.max(0, Math.min(100, (position / duration) * 100));
+    // Only write DOM if percent changed by >= 0.5% (visible threshold)
+    if (Math.abs(percent - lastPaintedPercentRef.current) < 0.5) return;
+    lastPaintedPercentRef.current = percent;
     const fill = fillRef.current;
     const thumb = thumbRef.current;
     if (fill) fill.style.width = `${percent}%`;
-    if (thumb) thumb.style.left = `calc(${percent}% - 6px)`;
+    if (thumb) thumb.style.left = `${percent}%`;
   }, [fillRef, thumbRef]);
 
   const percentFromClientX = (clientX) => {
@@ -76,8 +79,8 @@ export function useProgressDrag({
     const duration = getDurationRef.current() || 0;
     const pos = pct * duration;
     pendingSeekRef.current = pos;
-    paint(pos, duration);
-  }, [paint]);
+    paintThrottled(pos, duration);
+  }, [paintThrottled]);
 
   const endDrag = useCallback(() => {
     if (!draggingRef.current) return;
@@ -121,13 +124,13 @@ export function useProgressDrag({
     const duration = getDurationRef.current() || 0;
     const pos = pct * duration;
     pendingSeekRef.current = pos;
-    paint(pos, duration);
+    paintThrottled(pos, duration);
 
     window.addEventListener('pointermove', handlePointerMove, { passive: false });
     window.addEventListener('pointerup', endDrag);
     window.addEventListener('pointercancel', endDrag);
     if (e.cancelable) e.preventDefault();
-  }, [enabled, trackRef, paint, handlePointerMove, endDrag, setStoreDragging]);
+  }, [enabled, trackRef, paintThrottled, handlePointerMove, endDrag, setStoreDragging]);
 
   // Smooth playback animation: one rAF loop for the lifetime of the hook.
   // Reads the live position getter every frame; skipped while dragging.
@@ -147,7 +150,7 @@ export function useProgressDrag({
         const duration = getDurationRef.current() || 0;
         const pos = getPositionRef.current();
         if (duration > 0 && Number.isFinite(pos) && pos >= 0) {
-          paint(pos, duration);
+          paintThrottled(pos, duration);
         }
       }
       rafRef.current = requestAnimationFrame(tick);
@@ -157,7 +160,7 @@ export function useProgressDrag({
       stopped = true;
       cancelAnimationFrame(rafRef.current);
     };
-  }, [enabled, paint, handlePointerMove, endDrag]);
+  }, [enabled, paintThrottled, handlePointerMove, endDrag]);
 
   // Safety net: if the component unmounts mid-drag, tear down window listeners.
   useEffect(() => () => {
@@ -166,5 +169,38 @@ export function useProgressDrag({
     window.removeEventListener('pointercancel', endDrag);
   }, [handlePointerMove, endDrag]);
 
-  return { onPointerDown: handlePointerDown, isDraggingRef: draggingRef };
+  // The track element's initial pointerdown is attached natively so it works
+  // reliably inside WebViews where React synthetic pointer events may not fire.
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || !enabled) return;
+
+    const onPointerDown = (e) => {
+      if (e.button != null && e.button > 0) return;
+      const rect = track.getBoundingClientRect();
+      if (rect.width === 0) return;
+
+      rectRef.current = rect;
+      activePointerRef.current = e.pointerId;
+      draggingRef.current = true;
+      setStoreDragging(true);
+      track.classList.add('progress-dragging');
+
+      const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const duration = getDurationRef.current() || 0;
+      const pos = pct * duration;
+      pendingSeekRef.current = pos;
+      paintThrottled(pos, duration);
+
+      window.addEventListener('pointermove', handlePointerMove, { passive: false });
+      window.addEventListener('pointerup', endDrag);
+      window.addEventListener('pointercancel', endDrag);
+      if (e.cancelable) e.preventDefault();
+    };
+
+    track.addEventListener('pointerdown', onPointerDown, { passive: false });
+    return () => track.removeEventListener('pointerdown', onPointerDown);
+  }, [enabled, trackRef, paintThrottled, handlePointerMove, endDrag, setStoreDragging]);
+
+  return { isDraggingRef: draggingRef };
 }

@@ -1,5 +1,5 @@
 import { HashRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { useCallback, useEffect, useRef, useState, lazy, Suspense } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Music, X } from './icons.jsx';
 import { usePlayerStore } from './store';
 import { getTrackLyrics, resolveMediaUrl } from './api';
@@ -15,23 +15,23 @@ import { App as CapacitorApp } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Device } from '@capacitor/device';
 
-// Pages - lazy loaded for code splitting
-const Home = lazy(() => import('./pages/Home'));
-const Tracks = lazy(() => import('./pages/Tracks'));
-const PlayerPage = lazy(() => import('./pages/PlayerPage'));
-const Playlists = lazy(() => import('./pages/Playlists'));
-const PlaylistDetail = lazy(() => import('./pages/PlaylistDetail'));
-const Artists = lazy(() => import('./pages/Artists'));
-const ArtistDetail = lazy(() => import('./pages/ArtistDetail'));
-const Albums = lazy(() => import('./pages/Albums'));
-const AlbumDetail = lazy(() => import('./pages/AlbumDetail'));
-const Favorites = lazy(() => import('./pages/Favorites'));
-const History = lazy(() => import('./pages/History'));
-const Login = lazy(() => import('./pages/Login'));
-const Profile = lazy(() => import('./pages/Profile'));
-const Share = lazy(() => import('./pages/Share'));
-const Download = lazy(() => import('./pages/Download'));
-const DownloadsManager = lazy(() => import('./components/DownloadsManager.jsx'));
+// Pages - direct imports (no code splitting, required for file:// ES module loading)
+import Home from './pages/Home';
+import Tracks from './pages/Tracks';
+import PlayerPage from './pages/PlayerPage';
+import Playlists from './pages/Playlists';
+import PlaylistDetail from './pages/PlaylistDetail';
+import Artists from './pages/Artists';
+import ArtistDetail from './pages/ArtistDetail';
+import Albums from './pages/Albums';
+import AlbumDetail from './pages/AlbumDetail';
+import Favorites from './pages/Favorites';
+import History from './pages/History';
+import Login from './pages/Login';
+import Profile from './pages/Profile';
+import Share from './pages/Share';
+import Download from './pages/Download';
+import DownloadsManager from './components/DownloadsManager.jsx';
 
 // Loading fallback
 const PageLoader = () => (
@@ -75,6 +75,8 @@ function getActiveLyricLine(currentPosition, syncedLines, plainLyrics) {
 }
 
 function AppContent() {
+  console.log('[STARTUP 1] AppContent mounted');
+  
   const {
     loadPlayerState,
     loadQueue,
@@ -334,8 +336,7 @@ const handleSwipeBack = useCallback(() => {
       {/* Main Content */}
       <div className={mainPadding}>
         <AppLifecycleManager />
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
+        <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/tracks" element={<Tracks />} />
             <Route path="/player" element={<PlayerPage />} />
@@ -352,11 +353,11 @@ const handleSwipeBack = useCallback(() => {
             <Route path="/albums/:album" element={<AlbumDetail />} />
             <Route path="/download" element={<Download />} />
           </Routes>
-        </Suspense>
       </div>
 
       {/* Player Controls (shown when track is playing) */}
       {shouldShowPlayer && (
+        console.log('[STARTUP 2] Rendering Player component'),
         <Player
           onHideDesktop={() => setIsPlayerHidden(true)}
           onSwipeDown={() => setIsPlayerHidden(true)}
@@ -379,6 +380,7 @@ const handleSwipeBack = useCallback(() => {
 
       {/* Bottom Navigation */}
       {!forceHideForSearch && (
+        console.log('[STARTUP 3] Rendering BottomNav component'),
         <BottomNav onRevealPlayer={() => setIsPlayerHidden(false)} isPlayerHidden={isPlayerHidden} />
       )}
 

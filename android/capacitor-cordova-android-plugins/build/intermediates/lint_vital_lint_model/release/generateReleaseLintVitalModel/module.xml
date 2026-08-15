@@ -1,6 +1,6 @@
 <lint-module
     format="1"
-    dir="/home/house/music-app/android/capacitor-cordova-android-plugins"
+    dir="/home/house/projects/music/android/capacitor-cordova-android-plugins"
     name=":capacitor-cordova-android-plugins"
     type="LIBRARY"
     maven="android:capacitor-cordova-android-plugins:unspecified"

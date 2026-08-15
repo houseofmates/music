@@ -23,6 +23,9 @@ import { resolveMediaUrl } from "../api.js";
 import { triggerImpact } from "../utils/haptics";
 import { useProgressDrag } from "../hooks/useProgressDrag";
 
+// Build identifier
+const BUILD_ID = 'f24548a';
+
 // Live getters so the progress fill animates from the <audio> element's
 // currentTime at 60fps (native path falls back to the store position).
 const liveDuration = () => {
@@ -171,6 +174,11 @@ function KeyboardShortcutsModal({ isOpen, onClose }) {
 }
 
 export default function NowPlaying({ onClose }) {
+  useEffect(() => {
+    console.log('[NowPlaying] MOUNTED build=' + BUILD_ID);
+    return () => console.log('[NowPlaying] UNMOUNTED');
+  }, []);
+
   const {
     currentTrack,
     isPlaying,
@@ -272,7 +280,7 @@ export default function NowPlaying({ onClose }) {
   const fillRef = useRef(null);
   const thumbRef = useRef(null);
 
-  const { onPointerDown } = useProgressDrag({
+  const { isDraggingRef } = useProgressDrag({
     getDuration: liveDuration,
     getCurrentPosition: livePosition,
     onSeek: seekTo,
@@ -496,7 +504,6 @@ export default function NowPlaying({ onClose }) {
             ref={trackRef}
             className={`flex-1 h-1.5 bg-[#222] rounded-full relative cursor-pointer`}
             style={{ touchAction: 'none' }}
-            onPointerDown={onPointerDown}
           >
             <div
               ref={fillRef}

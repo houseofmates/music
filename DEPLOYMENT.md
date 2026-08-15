@@ -78,14 +78,14 @@ docker compose version
 
 ### Clone Repository
 ```bash
-cd /home/house/Documents/docker/
+cd /home/house/projects/
 git clone <your-repo-url> music_app
 cd music_app
 ```
 
 Or if already exists, pull latest:
 ```bash
-cd /home/house/Documents/docker/music_app
+cd /home/house/projects/music
 git pull
 ```
 
@@ -132,7 +132,7 @@ Supported formats: MP3, FLAC, M4A, OGG, WAV
 ### Production Deployment
 
 ```bash
-cd /home/house/Documents/docker/music_app
+cd /home/house/projects/music
 
 # Build images
 docker compose build
@@ -174,7 +174,7 @@ curl http://localhost:8000/api/tracks
 ### Install Service
 
 ```bash
-cd /home/house/Documents/docker/music_app
+cd /home/house/projects/music
 
 # Copy service file
 sudo cp music.service /etc/systemd/system/
@@ -240,7 +240,7 @@ sudo systemctl start nginx
 ### Configure Reverse Proxy
 
 ```bash
-cd /home/house/Documents/docker/music_app
+cd /home/house/projects/music
 
 # Copy config
 sudo cp music.nginx.conf /etc/nginx/sites-available/music
@@ -397,7 +397,7 @@ sudo systemctl restart music
 ### Update Application
 
 ```bash
-cd /home/house/Documents/docker/music_app
+cd /home/house/projects/music
 
 # Pull latest code
 git pull
@@ -653,7 +653,7 @@ docker compose cp backend:/app/music.db ./backups/music-$(date +%Y%m%d).db
 
 ### File Locations
 
-- **Docker Compose:** `/home/house/Documents/docker/music_app`
+- **Docker Compose:** `/home/house/projects/music`
 - **Systemd Service:** `/etc/systemd/system/music.service`
 - **Nginx Config:** `/etc/nginx/sites-available/music`
 - **Nginx Logs:** `/var/log/nginx/`

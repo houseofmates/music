@@ -218,13 +218,11 @@ export default function History() {
                 onClick={() => playTrack(item.track)}
                 className="w-full flex items-center justify-between rounded-2xl border border-[#333] bg-[#111] p-3 text-left hover:bg-[#1a1a1a]"
               >
-                <div>
+                <div className="min-w-0 overflow-hidden">
                   <div className="text-white font-semibold truncate">{item.track.title || item.track.filename}</div>
-                  <div className="text-[#888] text-sm truncate">
-                    {item.track.artist || 'unknown artist'} • {new Date(item.played_at).toLocaleString()}
-                  </div>
+                  <div className="text-[#888] text-xs">{item.track.artist || 'unknown artist'} • {new Date(item.played_at).toLocaleString()}</div>
                 </div>
-                <Play className="h-5 w-5 text-vibe-gold" />
+                <Play className="h-5 w-5 text-vibe-gold flex-shrink-0 ml-2" />
               </button>
             ))}
           </div>

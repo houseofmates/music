@@ -18,7 +18,7 @@ function Harness({ onSeek, enabled = true }) {
   const trackRef = useRef(null);
   const fillRef = useRef(null);
   const thumbRef = useRef(null);
-  const { onPointerDown } = useProgressDrag({
+  useProgressDrag({
     getDuration: () => DURATION,
     getCurrentPosition: () => 0,
     onSeek,
@@ -28,7 +28,7 @@ function Harness({ onSeek, enabled = true }) {
     enabled,
   });
   return (
-    <div data-testid="track" ref={trackRef} onPointerDown={onPointerDown}>
+    <div data-testid="track" ref={trackRef}>
       <div data-testid="fill" ref={fillRef} />
       <div data-testid="thumb" ref={thumbRef} />
     </div>
@@ -56,7 +56,7 @@ describe('useProgressDrag', () => {
     fireEvent.pointerMove(window, { clientX: 100, pointerId: 1 }); // 50% of 200px
 
     expect(getByTestId('fill').style.width).toBe('50%');
-    expect(getByTestId('thumb').style.left).toBe('calc(50% - 6px)');
+    expect(getByTestId('thumb').style.left).toBe('50%');
     // No seek until release.
     expect(onSeek).not.toHaveBeenCalled();
   });

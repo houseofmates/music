@@ -13,6 +13,9 @@ import { useDataSaver } from '../context/DataSaverContext';
 import AudioProcessingModal from './AudioProcessingModal';
 import { useProgressDrag } from '../hooks/useProgressDrag';
 
+// Build identifier
+const BUILD_ID = 'f24548a';
+
 // Live position/duration getters read straight from the store so the rAF
 // progress animation follows the <audio> element's currentTime at 60fps
 // (falling back to the store position on the native-playback path).
@@ -27,6 +30,11 @@ const livePosition = () => {
 };
 
 export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
+  useEffect(() => {
+    console.log('[BottomNav] MOUNTED build=' + BUILD_ID);
+    return () => console.log('[BottomNav] UNMOUNTED');
+  }, []);
+
   const location = useLocation();
   const navigate = useNavigate();
   const dataSaver = useDataSaver();
@@ -116,28 +124,28 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
   const desktopFillRef = useRef(null);
   const desktopThumbRef = useRef(null);
 
-  const { onPointerDown: onDesktopPointerDown } = useProgressDrag({
+  const { isDraggingRef: _desktopDraggingRef } = useProgressDrag({
     getDuration: liveDuration,
     getCurrentPosition: livePosition,
     onSeek: seekTo,
     trackRef: desktopProgressBarRef,
     fillRef: desktopFillRef,
     thumbRef: desktopThumbRef,
-    enabled: isPlayerHidden && isDesktopViewport,
+    enabled: !isPlayerHidden && isDesktopViewport,
   });
 
   const mobileProgressBarRef = useRef(null);
   const mobileFillRef = useRef(null);
   const mobileThumbRef = useRef(null);
 
-  const { onPointerDown: onMobilePointerDown } = useProgressDrag({
+  const { isDraggingRef: _mobileDraggingRef } = useProgressDrag({
     getDuration: liveDuration,
     getCurrentPosition: livePosition,
     onSeek: seekTo,
     trackRef: mobileProgressBarRef,
     fillRef: mobileFillRef,
     thumbRef: mobileThumbRef,
-    enabled: isPlayerHidden && !isDesktopViewport,
+    enabled: !isPlayerHidden && !isDesktopViewport,
   });
 
   const formatTime = (s) => {
@@ -392,11 +400,10 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  <div className="flex items-center gap-2 w-full max-w-xs lg:max-w-sm">
  <span className="text-white/40 text-xs flex-shrink-0">{formatTime(currentPosition)}</span>
 <div
-    ref={desktopProgressBarRef}
-    className="relative flex-1 h-1.5 bg-[#222] rounded-full cursor-pointer"
-    style={{ touchAction: 'none' }}
-    onPointerDown={onDesktopPointerDown}
-  >
+  ref={desktopProgressBarRef}
+  className="relative flex-1 h-1.5 bg-[#222] rounded-full cursor-pointer"
+  style={{ touchAction: 'none' }}
+>
     <div
       ref={desktopFillRef}
       className="absolute left-0 top-0 bottom-0 bg-[#f6b012] rounded-full"
@@ -404,8 +411,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     />
     <div
       ref={desktopThumbRef}
-      className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
-      style={{ left: '-6px' }}
+      className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
     />
   </div>
  <span className="text-white/40 text-xs flex-shrink-0">{formatTime(duration)}</span>
@@ -430,7 +436,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
 
        {/* ===== BOTTOM NAV BAR ===== */}
        <nav
-         className="fixed bottom-0 left-0 right-0 bg-[#050505] border-t-2 border-[#ffbb20] flex flex-col pb-safe z-40"
+         className="fixed bottom-0 left-0 right-0 bg-[#050505] border-t border-[#ffbb20] flex flex-col pb-safe z-40"
          onTouchStart={handleQuickActionsTouchStart}
          onTouchEnd={handleQuickActionsTouchEnd}
          style={{ fontFamily: '"Varela Round", sans-serif' }}
@@ -439,7 +445,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
   {showPlayerControls && (
   <div className="md:hidden flex-shrink-0 mobile-player-strip">
  {/* Track info row - title and artist centered on screen */}
- <div className="relative flex items-center px-3 pt-0 pb-0" style={{ minHeight: '32px' }}>
+ <div className="relative flex items-center px-2 pt-0 pb-0" style={{ minHeight: '24px' }}>
  {/* Cover art - left side */}
  {currentTrack.cover_art_url ? (
  <img
@@ -469,11 +475,11 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     so the fixed vertical gap between the controls row and the progress bar
     is guaranteed regardless of button sizes — the play button can never
     overlap the progress bar on any screen size. */}
-  <div className="flex flex-col gap-2 px-4 py-2">
+  <div className="flex flex-col gap-0.5 px-2 py-0">
    {/* Controls row */}
-   <div className="flex items-center justify-between" style={{ minHeight: '48px' }}>
+   <div className="flex items-center justify-center gap-1" style={{ minHeight: '2rem' }}>
     {/* Left group: lyrics, repeat */}
-   <div className="flex items-center gap-2">
+   <div className="flex items-center gap-1">
      <button
      onClick={() => { navigate('/player'); }}
      className="w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-none text-white"
@@ -492,37 +498,37 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
    </div>
 
    {/* Center group: previous, play/pause, next - flex layout */}
-   <div className="flex items-center justify-center gap-3 flex-shrink-0">
+   <div className="flex items-center justify-center gap-1 flex-shrink-0">
      <button
      onClick={previousTrack}
-     className="w-11 h-11 flex items-center justify-center text-white rounded-full active:scale-90 transition-none"
+     className="w-10 h-10 flex items-center justify-center text-white rounded-full active:scale-90 transition-none"
      aria-label="previous"
      >
-     <SkipBack className="w-6 h-6 fill-current" />
+     <SkipBack className="w-5 h-5 fill-current" />
      </button>
 
-     <button
-      onClick={() => { triggerImpact('medium'); playPause(); }}
-      className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-[#ffb10f] text-black rounded-full active:scale-90 transition-none"
-      aria-label={isPlaying ? 'pause' : 'play'}
-      >
+<button
+       onClick={() => { triggerImpact('medium'); playPause(); }}
+       className="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-[#ffb10f] text-black rounded-full active:scale-90 transition-none"
+       aria-label={isPlaying ? 'pause' : 'play'}
+       >
       {isPlaying
-      ? <Pause className="w-6 h-6 fill-current" />
-      : <Play className="w-6 h-6 fill-current" style={{ marginLeft: '2px' }} />
+      ? <Pause className="w-5 h-5 fill-current" />
+      : <Play className="w-5 h-5 fill-current" style={{ marginLeft: '1px' }} />
       }
       </button>
 
      <button
      onClick={nextTrack}
-     className="w-11 h-11 flex items-center justify-center text-white rounded-full active:scale-90 transition-none"
+     className="w-10 h-10 flex items-center justify-center text-white rounded-full active:scale-90 transition-none"
      aria-label="next"
      >
-     <SkipForward className="w-6 h-6 fill-current" />
+     <SkipForward className="w-5 h-5 fill-current" />
      </button>
    </div>
 
    {/* Right group: shuffle, queue */}
-   <div className="flex items-center gap-2">
+   <div className="flex items-center gap-1">
      <button
        onClick={toggleShuffle}
        className={`w-10 h-10 flex items-center justify-center rounded-full active:scale-90 transition-none ${shuffle ? 'text-[#ffb10f]' : 'text-white'}`}
@@ -547,7 +553,6 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     ref={mobileProgressBarRef}
     className="w-full h-1.5 bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer relative"
     style={{ touchAction: 'none' }}
-    onPointerDown={onMobilePointerDown}
   >
     {/* Progress fill bar */}
     <div
@@ -558,11 +563,10 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     {/* Yellow thumb/circle indicator */}
     <div
       ref={mobileThumbRef}
-      className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
-      style={{ left: '-6px' }}
+      className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
     />
   </div>
-  <div className="flex justify-between mt-1">
+  <div className="flex justify-between">
     <span className="text-white/40 text-[10px]">{formatTime(currentPosition)}</span>
     <span className="text-white/40 text-[10px]">{formatTime(duration)}</span>
   </div>
@@ -596,7 +600,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  )}
 
  {/* Nav icons row (always shown) */}
- <div className="flex justify-around items-center h-14 xl:h-16">
+ <div className="flex justify-between items-center h-14 xl:h-16 px-1">
    {navItems.map((item) => {
      const Icon = item.icon;
      const isActive = getIsActive(item);
@@ -604,7 +608,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
        <button
          key={item.path}
          onClick={() => handleNavClick(item.path, isActive)}
-         className={`flex flex-col items-center justify-center flex-1 h-full transition-none ${isActive ? 'text-[#f6b012]' : 'text-white'} hover:text-[#ffd86a]`}
+         className={`flex flex-col items-center justify-center flex-1 h-full transition-none ${isActive ? 'text-[#f6b012]' : 'text-white'} md:hover:text-[#ffd86a]`}
        >
          <Icon className="w-6 h-6 xl:w-10 xl:h-10 stroke-current" fill="none" strokeWidth={2} />
          <span className="hidden md:block text-xs xl:text-sm lowercase leading-none mt-0.5 xl:mt-1">

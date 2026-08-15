@@ -4,8 +4,8 @@
 import sys
 import os
 
-os.chdir('/home/house/Documents/docker/music_app')
-sys.path.insert(0, '/home/house/Documents/docker/music_app/backend')
+os.chdir('/home/house/projects/music')
+sys.path.insert(0, '/home/house/projects/music/backend')
 
 import config
 config.settings.database_url = "sqlite:///./music.db"

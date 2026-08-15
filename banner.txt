@@ -56,7 +56,7 @@
 ═══════════════════════════════════════════════════════════════════════════════
 
   1. Navigate to project:
-     cd /home/house/Documents/docker/music_app
+     cd /home/house/projects/music
 
   2. Configure (optional):
      cd backend && cp .env.example .env

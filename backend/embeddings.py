@@ -115,6 +115,8 @@ def rebuild_index(session: Session) -> None:
         logger.warning("faiss not available - skipping index rebuild")
         return
 
+    VECTOR_DIR.mkdir(parents=True, exist_ok=True)
+
     with _lock:
         embeddings = []
         ids = []

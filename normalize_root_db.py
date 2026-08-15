@@ -5,8 +5,8 @@ import sys
 import os
 
 # Use the root-level database
-os.chdir('/home/house/Documents/docker/music_app')
-sys.path.insert(0, '/home/house/Documents/docker/music_app/backend')
+os.chdir('/home/house/projects/music')
+sys.path.insert(0, '/home/house/projects/music/backend')
 
 # Override the database URL to use root music.db
 import config

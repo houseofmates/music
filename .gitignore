@@ -91,3 +91,5 @@ keystore.properties
 node_modules/
 __pycache__/
 .DS_Store
+android/.gradle/
+android/app/build/

@@ -4,10 +4,6 @@ const config: CapacitorConfig = {
   appId: 'com.house.music',
   appName: 'Music',
   webDir: 'dist',
-  server: {
-    androidScheme: 'https',
-    cleartext: true
-  },
   android: {
     buildOptions: {
       keystorePath: 'release-key.keystore',
@@ -31,11 +27,9 @@ const config: CapacitorConfig = {
       backgroundColor: '#050505',
       overlaysWebView: true
     },
-    // Enhanced offline capabilities
     App: {
       appendUserAgent: 'MusicApp/1.0.0'
     },
-    // Background mode for continuous playback
     BackgroundMode: {
       title: 'Music Playing',
       text: 'Your music continues playing',

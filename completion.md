@@ -146,7 +146,7 @@ music_app/
 ### 1. Initial Setup (5 minutes)
 
 ```bash
-cd /home/house/Documents/docker/music_app
+cd /home/house/projects/music
 
 # Configure backend (optional but recommended)
 cd backend
@@ -162,7 +162,7 @@ cp .env.example .env
 
 ```bash
 # Option A: Quick start with script
-cd /home/house/Documents/docker/music_app
+cd /home/house/projects/music
 ./setup.sh
 
 # Option B: Manual start

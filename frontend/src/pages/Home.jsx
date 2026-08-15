@@ -201,7 +201,7 @@ setArtists(artistsData);
  </div>
 
  {/* Content */}
- <div className="px-4 md:px-0 pt-4 md:pt-2 space-y-6 md:space-y-4">
+ <div className="px-4 md:px-0 pt-4 md:pt-2 space-y-4 md:space-y-3">
  {loading ? (
  <div className="flex items-center justify-center py-12">
  <Loader2 className="w-8 h-8 text-vibe-gold animate-spin" />
@@ -252,14 +252,14 @@ setArtists(artistsData);
  {tracks.length > 0 && (
  <section>
  {/* Section header with "see all" inline with title */}
- <div className="flex items-end justify-between mb-3">
+ <div className="flex items-end justify-between mb-2">
  <h2 className="text-lg font-bold text-white">recent tracks</h2>
  <Link to="/tracks" className="text-sm text-vibe-gold pb-0.5">see all</Link>
  </div>
  
  {isAndroidNative ? (
- // APK: Horizontal scrollable list
- <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
+     // APK: Horizontal scrollable list
+     <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4">
  {tracks.slice(0, 10).map((track) => (
  <div
  key={track.id}
@@ -312,7 +312,7 @@ setArtists(artistsData);
  {/* Playlists */}
  {playlists.length > 0 && (
  <section>
- <div className="flex items-end justify-between mb-3">
+ <div className="flex items-end justify-between mb-2">
  <h2 className="text-lg font-bold text-white">playlists</h2>
  <Link to="/playlists" className="text-sm text-vibe-gold pb-0.5">see all</Link>
  </div>
@@ -343,7 +343,7 @@ setArtists(artistsData);
  {/* Albums */}
  {albums.length > 0 && (
  <section>
- <div className="flex items-end justify-between mb-3">
+ <div className="flex items-end justify-between mb-2">
  <h2 className="text-lg font-bold text-white">albums</h2>
  <Link to="/albums" className="text-sm text-vibe-gold pb-0.5">see all</Link>
  </div>
@@ -375,7 +375,7 @@ setArtists(artistsData);
  {/* Artists */}
  {artists.length > 0 && (
  <section>
- <div className="flex items-end justify-between mb-3">
+ <div className="flex items-end justify-between mb-2">
  <h2 className="text-lg font-bold text-white">artists</h2>
  <Link to="/artists" className="text-sm text-vibe-gold pb-0.5">see all</Link>
  </div>

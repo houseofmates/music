@@ -60,15 +60,15 @@ class Track(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=now_utc)
 
     # Relationships
-    queue_items: List["QueueItem"] = Relationship(back_populates="track")
-    playlist_items: List["PlaylistTrack"] = Relationship(back_populates="track")
-    player_states: List["PlayerState"] = Relationship(back_populates="current_track")
-    favorites: List["Favorite"] = Relationship(back_populates="track")
-    history: List["PlayHistory"] = Relationship(back_populates="track")
-    tags: List["TrackTag"] = Relationship(back_populates="track")
-    embeddings: List["TrackEmbedding"] = Relationship(back_populates="track")
-    audio_features: Optional["AudioFeatures"] = Relationship(back_populates="track")
-    play_stats: List["UserPlayStats"] = Relationship(back_populates="track")
+    queue_items: List["QueueItem"] = Relationship(back_populates="track", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    playlist_items: List["PlaylistTrack"] = Relationship(back_populates="track", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    player_states: List["PlayerState"] = Relationship(back_populates="current_track", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    favorites: List["Favorite"] = Relationship(back_populates="track", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    history: List["PlayHistory"] = Relationship(back_populates="track", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    tags: List["TrackTag"] = Relationship(back_populates="track", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    embeddings: List["TrackEmbedding"] = Relationship(back_populates="track", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    audio_features: Optional["AudioFeatures"] = Relationship(back_populates="track", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    play_stats: List["UserPlayStats"] = Relationship(back_populates="track", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
 
 class Playlist(SQLModel, table=True):

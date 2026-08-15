@@ -4,6 +4,8 @@ import App from './App.jsx';
 import './index.css';
 import { DataSaverProvider } from './context/DataSaverContext.jsx';
 
+console.log('STARTUP 1: main.jsx executing');
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);

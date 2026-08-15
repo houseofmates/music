@@ -75,6 +75,16 @@ const AppLifecycleManager = () => {
     if (typeof document === 'undefined') return;
     if (nativeMusic.isAvailable) return;
 
+    // Check if audio already exists in store to prevent duplicates on remount
+    const existingAudio = usePlayerStore.getState().audioRef;
+    const existingCrossfade = usePlayerStore.getState().crossfadeAudioRef;
+    if (existingAudio && existingCrossfade) {
+      mainAudioRef.current = existingAudio;
+      crossfadeAudioRef.current = existingCrossfade;
+      isMountedRef.current = true;
+      return;
+    }
+
     isMountedRef.current = true;
 
     // Initialize Main Audio

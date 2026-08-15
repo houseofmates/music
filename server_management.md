@@ -51,7 +51,7 @@ sudo systemctl restart music.service
 ### Option 2: Restart just the backend container (faster)
 ```bash
 # While the service is running
-cd /home/house/Documents/docker/music_app
+cd /home/house/projects/music
 docker compose restart backend
 ```
 
@@ -61,11 +61,11 @@ docker compose restart backend
 sudo systemctl stop music.service
 
 # Start backend in foreground for debugging
-cd /home/house/Documents/docker/music_app
+cd /home/house/projects/music
 docker compose up backend
 
 # Or run Python directly without Docker:
-cd /home/house/Documents/docker/music_app/backend
+cd /home/house/projects/music/backend
 python3 main.py
 ```
 
@@ -90,7 +90,7 @@ If you get "no such column" errors:
 sudo systemctl stop music.service
 
 # Run migration
-cd /home/house/Documents/docker/music_app/backend
+cd /home/house/projects/music/backend
 python3 migrate_all.py
 
 # Restart

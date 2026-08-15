@@ -214,7 +214,7 @@ music_app/
 ### Option 1: Docker (Recommended)
 
 ```bash
-cd /home/house/Documents/docker/music_app
+cd /home/house/projects/music
 
 # Quick start
 ./setup.sh

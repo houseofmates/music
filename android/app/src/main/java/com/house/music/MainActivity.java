@@ -2,6 +2,7 @@ package com.house.music;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -9,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
@@ -71,8 +73,8 @@ public class MainActivity extends BridgeActivity {
         
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        // Enable WebView debugging for Chrome DevTools (debug builds only)
-        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        // Enable WebView debugging for Chrome DevTools
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
 
@@ -117,13 +119,16 @@ public class MainActivity extends BridgeActivity {
         // Allow file access for local assets
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
+        // CRITICAL: Enable file:// access for ES module loading under file:// protocol.
+        // Without these, <script type="module"> and dynamic import() fail silently in WebView.
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
         
         // JavaScript settings
         settings.setJavaScriptEnabled(true);
         settings.setJavaScriptCanOpenWindowsAutomatically(true);
         
-        // Cache settings
-        settings.setAppCacheEnabled(true);
+        // Cache settings (AppCache deprecated in API 18, removed in API 21+ - skip entirely)
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         
         // Viewport settings
@@ -137,6 +142,15 @@ public class MainActivity extends BridgeActivity {
         
         // Prevent WebView from being destroyed during config changes
         webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                // Block localhost/127.0.0.1 navigation that breaks the app
+                if (url != null && (url.startsWith("http://localhost") || url.startsWith("http://127.0.0.1"))) {
+                    return true;
+                }
+                return false;
+            }
+
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                 super.onReceivedError(view, errorCode, description, failingUrl);
@@ -176,8 +190,8 @@ public class MainActivity extends BridgeActivity {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         MusicWidgetProvider.updateAllWidgets(this);
         
-        // Re-apply WebView settings in case they were reset
-        if (isWebViewInitialized && getBridge() != null && getBridge().getWebView() != null) {
+        // Re-apply WebView settings in case they were reset or were missed in onCreate
+        if (getBridge() != null && getBridge().getWebView() != null) {
             configureWebView();
         }
         

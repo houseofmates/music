@@ -14,7 +14,6 @@ import {
  GripVertical,
 } from '../icons.jsx';
 import { usePlayerStore } from '../store';
-import VolumeSlider from './VolumeSlider';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -52,7 +51,9 @@ function formatTime(seconds) {
 
 
 export default function Player({ onHideDesktop, onSwipeDown, searchOverlayActive = false }) {
- const navigate = useNavigate();
+  console.log('[STARTUP 2a] Player component mounted');
+  
+  const navigate = useNavigate();
   const {
   currentTrack,
   isPlaying,
@@ -252,30 +253,19 @@ export default function Player({ onHideDesktop, onSwipeDown, searchOverlayActive
  }
  } catch (error) {
  }
- };
+};
 
- // Get audioRef from store for volume sync
- const audioRef = usePlayerStore((state) => state.audioRef);
-
- // Sync volume with audio element
- useEffect(() => {
- const audio = audioRef;
- if (!audio) return;
- audio.volume = isMuted ? 0 : volume;
- }, [audioRef, volume, isMuted]);
-
- const filteredQueue = useMemo(() => {
- const q = queueSearch.trim().toLowerCase();
- if (!q) return queueItems;
- return queueItems.filter((item) => {
- const haystack = `${queueTrackLabel(item)} ${item.track.artist || ''} ${item.track.album || ''}`.toLowerCase();
- return haystack.includes(q);
- });
- }, [queueItems, queueSearch]);
+  const filteredQueue = useMemo(() => {
+  const q = queueSearch.trim().toLowerCase();
+  if (!q) return queueItems;
+  return queueItems.filter((item) => {
+    const haystack = `${queueTrackLabel(item)} ${item.track.artist || ''} ${item.track.album || ''}`.toLowerCase();
+    return haystack.includes(q);
+  });
+}, [queueItems, queueSearch]);
 
 
-
- const handleVolumeChange = (e) => {
+const handleVolumeChange = (e) => {
  const newVolume = parseFloat(e.target.value);
  setVolume(newVolume);
  if (newVolume > 0 && isMuted) {

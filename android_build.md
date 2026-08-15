@@ -31,7 +31,7 @@ export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64  # Adjust path as needed
 
 ### 1. Install Dependencies
 ```bash
-cd /home/house/Documents/docker/music_app/frontend
+cd /home/house/projects/music/frontend
 npm install
 ```
 
@@ -78,7 +78,7 @@ This opens the Android project in Android Studio where you can:
 ### Step 1: Generate Keystore (First Time Only)
 
 ```bash
-cd /home/house/Documents/docker/music_app/frontend
+cd /home/house/projects/music/frontend
 
 # Generate release keystore
 keytool -genkey -v -keystore release-key.keystore \
@@ -99,7 +99,7 @@ keytool -genkey -v -keystore release-key.keystore \
 
 Create `android/key.properties`:
 ```properties
-storeFile=/home/house/Documents/docker/music_app/frontend/release-key.keystore
+storeFile=/home/house/projects/music/frontend/release-key.keystore
 storePassword=YOUR_KEYSTORE_PASSWORD
 keyAlias=music-key
 keyPassword=YOUR_KEY_PASSWORD
@@ -149,7 +149,7 @@ android {
 ### Step 4: Build Release APK
 
 ```bash
-cd /home/house/Documents/docker/music_app/frontend
+cd /home/house/projects/music/frontend
 
 # 1. Build web assets
 npm run build
@@ -431,7 +431,7 @@ npm run android
 **Ready to build your first APK?**
 
 ```bash
-cd /home/house/Documents/docker/music_app/frontend
+cd /home/house/projects/music/frontend
 npm install
 npm run build
 npx cap add android

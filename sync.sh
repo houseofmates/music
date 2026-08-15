@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-cd /home/house/music
+cd /home/house/projects/music
 
 export GIT_TERMINAL_PROMPT=0
 git config user.email "house@houseofmates.space" >/dev/null 2>&1 || true

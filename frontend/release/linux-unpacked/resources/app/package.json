@@ -6,7 +6,6 @@
   "author": "house",
   "main": "electron/main.js",
   "dependencies": {
-    "@capacitor-community/http": "^1.4.1",
     "@capacitor/android": "^5.7.0",
     "@capacitor/app": "^5.0.6",
     "@capacitor/core": "^5.7.0",
@@ -24,7 +23,7 @@
     "lucide-react": "^0.312.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.21.0",
+    "react-router-dom": "^7.18.1",
     "zustand": "^4.4.7"
   }
 }

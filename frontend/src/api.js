@@ -33,9 +33,9 @@ const getFallbackApiBases = () => {
   }
 
   if (isAndroidNative) {
-    // Avoid hardcoding private IPs; rely on prod URL, localhost, and optional env override.
+    // On Android there is no local backend; use production only, plus optional env override.
     const envUrl = explicitApiUrl || '';
-    const bases = [DEFAULT_PROD_API_URL, 'http://127.0.0.1:3006/api'];
+    const bases = [DEFAULT_PROD_API_URL];
     if (envUrl && envUrl !== DEFAULT_PROD_API_URL) {
       bases.unshift(envUrl);
     }
@@ -52,7 +52,7 @@ const getFallbackApiBases = () => {
   return [
     '/api',
     DEFAULT_PROD_API_URL,
-    'http://localhost:3006/api',
+    'https://music.houseofmates.space/api',
   ];
 };
 
@@ -106,7 +106,7 @@ const resolveApiBase = () => {
     return cachedBaseUrl;
   }
 
-  const fallbackOrigin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+  const fallbackOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://music.houseofmates.space';
   try {
     cachedBaseUrl = new URL(api.defaults.baseURL, fallbackOrigin);
   } catch {

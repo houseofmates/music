@@ -1,17 +1,16 @@
 {
   "appId": "com.house.music",
-  "appName": "music",
-  "webDir": "dist",
-  "server": {
-    "androidScheme": "https",
-    "cleartext": true
-  },
+  "appName": "Music",
+  "webDir": "public",
   "android": {
     "buildOptions": {
       "keystorePath": "release-key.keystore",
       "keystoreAlias": "music-key",
       "releaseType": "APK"
-    }
+    },
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
   },
   "plugins": {
     "SplashScreen": {
@@ -25,6 +24,17 @@
       "style": "DARK",
       "backgroundColor": "#050505",
       "overlaysWebView": true
+    },
+    "App": {
+      "appendUserAgent": "MusicApp/1.0.0"
+    },
+    "BackgroundMode": {
+      "title": "Music Playing",
+      "text": "Your music continues playing",
+      "icon": "icon",
+      "color": "#f6b012",
+      "silent": false,
+      "visible": true
     }
   }
 }

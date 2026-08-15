@@ -629,12 +629,12 @@ export const usePlayerStore = create((set, get) => ({
     // Disconnect silent oscillator to prevent audio pipeline interference
     get().disconnectSilentNode();
 
-    // Set state BEFORE loading new source
+    // Set track info FIRST, but keep isPlaying=false until audio actually starts
     set({
       currentTrack: { ...track },
       currentQueueIndex: queueIndex,
       currentPosition: 0,
-      isPlaying: true,
+      // isPlaying will be set to true ONLY after successful play()
       nextTrackPreloaded: false,
       audioDuration: (track.duration && Number.isFinite(track.duration) && track.duration > 0) ? track.duration : 0,
     });
@@ -650,10 +650,17 @@ export const usePlayerStore = create((set, get) => ({
       }
 
       if (nativeMusic.isAvailable) {
-        await nativeMusic.play(streamUrl, track);
+        const success = await nativeMusic.play(streamUrl, track);
+        if (success) {
+          set({ isPlaying: true });
+        } else {
+          set({ isPlaying: false });
+          return;
+        }
       } else if (audioRef) {
         audioRef.src = streamUrl;
         audioRef.preload = 'auto';
+        audioRef.volume = volume; // Ensure volume is set before play
         audioRef.load();
 
         await new Promise((resolve, reject) => {
@@ -688,7 +695,15 @@ export const usePlayerStore = create((set, get) => ({
           setTimeout(() => { if (!done) { cleanup(); resolve(); } }, 10000);
         });
 
-        await audioRef.play();
+        // Only set isPlaying=true after successful play()
+        try {
+          await audioRef.play();
+          set({ isPlaying: true });
+        } catch (playError) {
+          console.error('Audio play failed:', playError);
+          set({ isPlaying: false });
+          throw playError;
+        }
       }
 
       // Record play history
@@ -745,7 +760,7 @@ export const usePlayerStore = create((set, get) => ({
   },
   
   forceRecovery: async () => {
-    const { audioRef, currentTrack, currentPosition, isPlaying } = get();
+    const { audioRef, currentTrack, currentPosition, isPlaying, volume } = get();
     if (!audioRef && !nativeMusic.isAvailable) return;
     if (!currentTrack) return;
     try {
@@ -762,6 +777,7 @@ export const usePlayerStore = create((set, get) => ({
             streamUrl = api.getTrackStreamSrc(currentTrack.id);
           }
           await nativeMusic.play(streamUrl, currentTrack);
+          set({ isPlaying: true });
           return;
         }
 
@@ -772,14 +788,17 @@ export const usePlayerStore = create((set, get) => ({
           const blobUrl = URL.createObjectURL(blob);
           audioRef.src = blobUrl;
         } else {
-audioRef.src = api.getTrackStreamSrc(currentTrack.id);
+          audioRef.src = api.getTrackStreamSrc(currentTrack.id);
         }
+        audioRef.volume = volume;
         audioRef.load();
         audioRef.currentTime = currentPosition;
         await audioRef.play();
+        set({ isPlaying: true });
       }
     } catch (e) {
       console.error("forceRecovery failed:", e);
+      set({ isPlaying: false });
     }
   },
   
