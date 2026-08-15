@@ -608,7 +608,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  )}
 
  {/* Nav icons row (always shown) */}
- <div className="flex justify-between items-center h-14 xl:h-16 px-1">
+ <div className="bg-[#050505] flex justify-between items-center h-14 xl:h-16 px-1">
    {navItems.map((item) => {
      const Icon = item.icon;
      const isActive = getIsActive(item);
