@@ -232,10 +232,9 @@ public class MainActivity extends BridgeActivity {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         MusicWidgetProvider.updateAllWidgets(this);
         
-        // Re-apply WebView settings and status bar padding
+        // Re-apply WebView settings
         if (getBridge() != null && getBridge().getWebView() != null) {
             configureWebView();
-            applyStatusBarPadding();
         }
         
         // Refresh locks if needed
