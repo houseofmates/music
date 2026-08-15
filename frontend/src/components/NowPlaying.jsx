@@ -503,31 +503,29 @@ export default function NowPlaying({ onClose }) {
           </div>
         </div>
 
-        {/* progress bar row — the ref/handler go on the TRACK element itself so
-            the pointer maths use the same box the fill/thumb are positioned in.
-            (Previously the ref was on this outer flex row, which includes the
-            two time labels, so the drag geometry never matched the visible bar
-            and the thumb did not follow the finger.) */}
-        <div className="flex items-center gap-2 w-full max-w-[280px] select-none shrink-0">
-          <span className="text-xs text-white/60 w-10 text-right">{formatTime(currentPosition)}</span>
-          <div
-            ref={trackRef}
-            className={`flex-1 h-1.5 bg-[#222] rounded-full relative cursor-pointer`}
-            style={{ touchAction: 'none' }}
-          >
-            <div
-              ref={fillRef}
-              className="absolute left-0 top-0 bottom-0 bg-[#f6b012] rounded-full"
-              style={{ width: 0 }}
-            />
-            <div
-              ref={thumbRef}
-              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
-              style={{ left: '-6px' }}
-            />
-          </div>
-          <span className="text-xs text-white/60 w-10">{formatTime(duration)}</span>
-        </div>
+        {/* progress bar row — range input for reliable tap + drag seeking */}
+<div className="flex items-center gap-2 w-full max-w-[280px] select-none shrink-0">
+  <span className="text-xs text-white/60 w-10 text-right">{formatTime(currentPosition)}</span>
+  <input
+    ref={rangeRef}
+    type="range"
+    min="0"
+    max="100"
+    step="0.1"
+    className="progress-range flex-1"
+    style={{ touchAction: 'none' }}
+    onTouchStart={() => { interactingRef.current = true; }}
+    onTouchEnd={() => { interactingRef.current = false; }}
+    onMouseDown={() => { interactingRef.current = true; }}
+    onMouseUp={() => { interactingRef.current = false; }}
+    onInput={(e) => {
+      const val = parseFloat(e.target.value);
+      const dur = liveDuration();
+      if (dur > 0) seekTo((val / 100) * dur);
+    }}
+  />
+  <span className="text-xs text-white/60 w-10">{formatTime(duration)}</span>
+</div>
       </div>
 
       {/* queue panel */}
