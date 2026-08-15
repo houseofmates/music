@@ -393,16 +393,15 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
 
  {/* Right: progress bar centered between center column and right edge + toggle buttons */}
  <div className="flex items-center gap-2 min-w-0">
- {currentTrack && !isPlayerHidden && (
- <>
- {/* Progress bar - centered, bridging space */}
- <div className="flex items-center gap-2 flex-1 justify-center">
- <div className="flex items-center gap-2 w-full max-w-xs lg:max-w-sm">
- <span className="text-white/40 text-xs flex-shrink-0">{formatTime(currentPosition)}</span>
+ <div className={currentTrack && !isPlayerHidden ? '' : 'hidden'}>
+{/* Progress bar - centered, bridging space */}
+<div className="flex items-center gap-2 flex-1 justify-center">
+<div className="flex items-center gap-2 w-full max-w-xs lg:max-w-sm">
+<span className="text-white/40 text-xs flex-shrink-0">{formatTime(currentPosition)}</span>
 <div
-  ref={desktopProgressBarRef}
-  className="relative flex-1 h-1.5 bg-[#222] rounded-full cursor-pointer"
-  style={{ touchAction: 'none' }}
+ ref={desktopProgressBarRef}
+ className="relative flex-1 h-2 bg-[#222] rounded-full cursor-pointer"
+ style={{ touchAction: 'none' }}
 >
     <div
       ref={desktopFillRef}
@@ -411,14 +410,13 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     />
     <div
       ref={desktopThumbRef}
-      className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
+      className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
     />
   </div>
- <span className="text-white/40 text-xs flex-shrink-0">{formatTime(duration)}</span>
- </div>
- </div>
- </>
- )}
+<span className="text-white/40 text-xs flex-shrink-0">{formatTime(duration)}</span>
+</div>
+</div>
+</div>
  <button type="button" onClick={() => handleToggle('offline')} disabled={pendingAction === 'offline'}
  className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors ${offlineActive ? 'border-[#ffbb20] bg-[#ffbb20]/10 text-[#ffbb20]' : 'border-white/10 bg-white/5 text-white/70'} ${pendingAction === 'offline' ? 'opacity-50 cursor-not-allowed' : ''}`}
  >
