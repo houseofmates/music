@@ -11,7 +11,6 @@ import { resolveMediaUrl } from '../api';
 import { triggerImpact } from '../utils/haptics';
 import { useDataSaver } from '../context/DataSaverContext';
 import AudioProcessingModal from './AudioProcessingModal';
-import { useProgressDrag } from '../hooks/useProgressDrag';
 
 // Build identifier
 const BUILD_ID = 'f24548a';
