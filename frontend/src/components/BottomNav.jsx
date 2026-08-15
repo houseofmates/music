@@ -272,7 +272,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
       />
 {/* ===== DESKTOP ONLY: Player bar ABOVE the nav bar ===== */}
  <div
- className="hidden md:grid fixed bottom-14 xl:bottom-16 left-0 right-0 bg-[#050505] border-t border-[#f6b012] items-center h-14 xl:h-16 z-40 px-4"
+ className="hidden md:grid fixed bottom-14 xl:bottom-16 left-0 right-0 bg-[#050505] items-center h-14 xl:h-16 z-40 px-4"
  style={{ fontFamily: '"Varela Round", sans-serif', gridTemplateColumns: 'minmax(0, 1fr) auto minmax(0, 1fr)' }}
  >
  {/* Left: track title */}
@@ -443,7 +443,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
 
        {/* ===== BOTTOM NAV BAR ===== */}
        <nav
-         className="fixed bottom-0 left-0 right-0 bg-[#050505] border-t border-[#ffbb20] flex flex-col pb-safe z-40"
+         className="fixed bottom-0 left-0 right-0 bg-[#050505] flex flex-col pb-safe z-40"
          onTouchStart={handleQuickActionsTouchStart}
          onTouchEnd={handleQuickActionsTouchEnd}
          style={{ fontFamily: '"Varela Round", sans-serif' }}
