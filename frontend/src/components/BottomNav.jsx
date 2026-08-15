@@ -553,25 +553,26 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
    </div>
    </div>
 
-   {/* Progress bar - div-based for reliable Android WebView pointer handling */}
+   {/* Progress bar - range input for reliable tap + drag seeking */}
    <div>
-    <div
-    ref={mobileProgressBarRef}
-    className="w-full h-2.5 bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer relative"
-    style={{ touchAction: 'none' }}
-  >
-    {/* Progress fill bar */}
-    <div
-      ref={mobileFillRef}
-      className="absolute left-0 top-0 bottom-0 bg-[#f6b012] rounded-full"
-      style={{ width: 0 }}
-    />
-    {/* Yellow thumb/circle indicator */}
-    <div
-      ref={mobileThumbRef}
-      className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
-    />
-  </div>
+    <input
+     ref={mobileRangeRef}
+     type="range"
+     min="0"
+     max="100"
+     step="0.1"
+     className="progress-range"
+     style={{ touchAction: 'none' }}
+     onTouchStart={() => { mobileInteractingRef.current = true; }}
+     onTouchEnd={() => { mobileInteractingRef.current = false; }}
+     onMouseDown={() => { mobileInteractingRef.current = true; }}
+     onMouseUp={() => { mobileInteractingRef.current = false; }}
+     onInput={(e) => {
+       const val = parseFloat(e.target.value);
+       const dur = liveDuration();
+       if (dur > 0) seekTo((val / 100) * dur);
+     }}
+   />
   <div className="flex justify-between">
     <span className="text-white/40 text-[10px]">{formatTime(currentPosition)}</span>
     <span className="text-white/40 text-[10px]">{formatTime(duration)}</span>
