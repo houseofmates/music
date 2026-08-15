@@ -550,7 +550,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
    <div>
     <div
     ref={mobileProgressBarRef}
-    className="w-full h-1.5 bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer relative"
+    className="w-full h-2.5 bg-[rgba(255,255,255,0.1)] rounded-full cursor-pointer relative"
     style={{ touchAction: 'none' }}
   >
     {/* Progress fill bar */}
@@ -562,7 +562,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     {/* Yellow thumb/circle indicator */}
     <div
       ref={mobileThumbRef}
-      className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
+      className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-[#f6b012] rounded-full border-2 border-white/80 shadow-sm"
     />
   </div>
   <div className="flex justify-between">
@@ -572,7 +572,6 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
   </div>
   </div>
   </div>
-  )}
 
  {/* No track playing on mobile - show simple quick actions */}
  {!showPlayerControls && (
