@@ -181,24 +181,6 @@ public class MainActivity extends BridgeActivity {
             }
 
             @Override
-            public void onPageFinished(WebView view, String url) {
-                // Inject CSS to compensate for status bar height so HTML content
-                // doesn't render behind it when using FLAG_LAYOUT_FULLSCREEN.
-                if (url != null && url.startsWith("file://")) {
-                    int statusBarHeight = getStatusBarHeight();
-                    String css = "body { padding-top: " + statusBarHeight + "px !important; }";
-                    String js = "javascript:(function() { "
-                        + "var style = document.createElement('style'); "
-                        + "style.type = 'text/css'; "
-                        + "style.innerHTML = '" + css.replace("'", "\'") + "'; "
-                        + "document.head.appendChild(style); "
-                        + "})()";
-                    view.evaluateJavascript(js, null);
-                }
-                super.onPageFinished(view, url);
-            }
-
-            @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                 // If we get an error loading a non-file URL, reload local assets
                 if (failingUrl != null && !failingUrl.startsWith("file://")) {

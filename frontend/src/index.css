@@ -749,8 +749,19 @@ input[type="range"]::-ms-thumb {
 }
 
 /* Safe area insets for native mobile — placed after @tailwind utilities so they override py-* etc. */
-.pt-safe { padding-top: env(safe-area-inset-top, 20px); }
+.pt-safe { padding-top: env(safe-area-inset-top, 30px); }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+
+/* Mobile-only status bar padding — only applies when native-app class is on body */
+.native-app body { padding-top: 30px; }
+.native-app { overflow-x: hidden; }
+
+/* Remove any visible border/outline from the bottom player strip and nav */
+nav, .mobile-player-strip {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
 
 /* Eliminate any visible outline around the bottom player strip / nav */
 nav, .mobile-player-strip, .mobile-player-strip > div {
