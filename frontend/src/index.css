@@ -286,10 +286,6 @@ input, textarea {
   text-transform: none;
 }
 
-/* Safe-area padding for status bar on mobile - only applies to native apps (APK) */
-.native-app .pt-safe {
-  padding-top: 50px;
-}
 
 #root {
   min-height: 100vh;
