@@ -21,7 +21,6 @@ import ImageWithFallback from "./ImageWithFallback";
 import LyricsPanel from "./LyricsPanel";
 import { resolveMediaUrl } from "../api.js";
 import { triggerImpact } from "../utils/haptics";
-import { useProgressDrag } from "../hooks/useProgressDrag";
 
 // Build identifier
 const BUILD_ID = 'f24548a';
