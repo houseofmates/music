@@ -34,9 +34,6 @@ public class MainActivity extends BridgeActivity {
         // Configure WebView before super.onCreate completes
         configureWebView();
 
-        // Push WebView content below the status bar so headers aren't obscured
-        applyStatusBarPadding();
-
         // Acquire a wake lock to keep the CPU running during playback
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         if (pm != null) {
@@ -81,16 +78,9 @@ public class MainActivity extends BridgeActivity {
             WebView.setWebContentsDebuggingEnabled(true);
         }
 
-        // Let content draw under status bar
-        getWindow().setFlags(
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-        );
-        
-        getWindow().getDecorView().setSystemUiVisibility(
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        );
+        // Show status bar statically (no fullscreen, no immersive mode)
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 
         MusicWidgetProvider.updateAllWidgets(this);
         requestBatteryOptimizationExemption();
