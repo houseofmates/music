@@ -444,7 +444,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
 
        {/* ===== BOTTOM NAV BAR ===== */}
        <nav
-         className="fixed bottom-0 left-0 right-0 bg-[#050505] flex flex-col pb-safe z-40"
+         className="fixed bottom-0 left-0 right-0 bg-[#050505] border-t border-[#ffbb20] flex flex-col pb-safe z-40"
          onTouchStart={handleQuickActionsTouchStart}
          onTouchEnd={handleQuickActionsTouchEnd}
          style={{ fontFamily: '"Varela Round", sans-serif' }}
