@@ -288,7 +288,7 @@ input, textarea {
 
 /* Safe-area padding for status bar on mobile - only applies to native apps (APK) */
 .native-app .pt-safe {
-  padding-top: 30px;
+  padding-top: 50px;
 }
 
 #root {
