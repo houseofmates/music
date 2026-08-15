@@ -35,6 +35,9 @@ public class MainActivity extends BridgeActivity {
         // Configure WebView before super.onCreate completes
         configureWebView();
 
+        // Push WebView content below the status bar so headers aren't obscured
+        applyStatusBarPadding();
+
         // Acquire a wake lock to keep the CPU running during playback
         PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
         if (pm != null) {
