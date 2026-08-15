@@ -461,10 +461,10 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
  <div className="text-center px-12">
  <p className="text-white text-[11px] font-semibold truncate leading-tight">
- {currentTrack.title || currentTrack.filename}
+  {currentTrack?.title || currentTrack?.filename || 'unknown'}
  </p>
  <p className="text-white/40 text-[9px] truncate leading-tight">
- {currentTrack.artist || 'unknown artist'}
+  {currentTrack?.artist || 'unknown artist'}
  </p>
  </div>
  </div>
