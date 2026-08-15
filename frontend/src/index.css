@@ -752,10 +752,7 @@ input[type="range"]::-ms-thumb {
 .pt-safe { padding-top: env(safe-area-inset-top, 30px); }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
 
-/* Mobile-only status bar padding — applies on small screens only */
-@media (max-width: 767px) {
-  body { padding-top: 30px !important; }
-}
+/* Mobile-only horizontal overflow guard */
 @media (max-width: 767px) {
   .native-app { overflow-x: hidden; }
 }
