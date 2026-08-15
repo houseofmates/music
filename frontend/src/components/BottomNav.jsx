@@ -482,7 +482,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     so the fixed vertical gap between the controls row and the progress bar
     is guaranteed regardless of button sizes — the play button can never
     overlap the progress bar on any screen size. */}
-  <div className="flex flex-col gap-0 px-2 py-0">
+  <div className="flex flex-col gap-0 px-1.5 py-0">
    {/* Controls row */}
    <div className="flex items-center justify-center gap-1" style={{ minHeight: '1.25rem' }}>
     {/* Left group: lyrics, repeat */}
@@ -555,7 +555,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
    </div>
 
    {/* Progress bar - range input for reliable tap + drag seeking */}
-   <div className="pb-0.5">
+   <div className="pb-0">
     <input
      ref={mobileRangeRef}
      type="range"
