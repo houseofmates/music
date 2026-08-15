@@ -184,25 +184,6 @@ public class MainActivity extends BridgeActivity {
         isWebViewInitialized = true;
     }
 
-    private void applyStatusBarPadding() {
-        if (getBridge() == null || getBridge().getWebView() == null) return;
-
-        WebView webView = getBridge().getWebView();
-        int statusBarHeight = getStatusBarHeight();
-        if (statusBarHeight > 0) {
-            webView.setPadding(0, statusBarHeight, 0, 0);
-        }
-    }
-
-    private int getStatusBarHeight() {
-        int statusBarHeight = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            statusBarHeight = getResources().getDimensionPixelSize(resourceId);
-        }
-        return statusBarHeight > 0 ? statusBarHeight : 50; // safe fallback
-    }
-
     private void requestBatteryOptimizationExemption() {
         try {
             PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);

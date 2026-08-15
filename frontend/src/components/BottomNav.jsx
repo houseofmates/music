@@ -484,7 +484,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     overlap the progress bar on any screen size. */}
   <div className="flex flex-col gap-0 px-2 py-0">
    {/* Controls row */}
-   <div className="flex items-center justify-center gap-1" style={{ minHeight: '1.5rem' }}>
+   <div className="flex items-center justify-center gap-1" style={{ minHeight: '1.25rem' }}>
     {/* Left group: lyrics, repeat */}
    <div className="flex items-center gap-1">
      <button
@@ -555,15 +555,15 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
    </div>
 
    {/* Progress bar - range input for reliable tap + drag seeking */}
-   <div>
+   <div className="pb-0.5">
     <input
      ref={mobileRangeRef}
      type="range"
      min="0"
      max="100"
      step="0.1"
-     className="progress-range"
-     style={{ touchAction: 'none' }}
+     className="progress-range block"
+     style={{ touchAction: 'none', height: '8px' }}
      onTouchStart={() => { mobileInteractingRef.current = true; }}
      onTouchEnd={() => { mobileInteractingRef.current = false; }}
      onMouseDown={() => { mobileInteractingRef.current = true; }}
@@ -575,9 +575,9 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
        e.target.style.setProperty('--progress', val + '%');
      }}
    />
-  <div className="flex justify-between">
-    <span className="text-white/40 text-[10px]">{formatTime(currentPosition)}</span>
-    <span className="text-white/40 text-[10px]">{formatTime(duration)}</span>
+  <div className="flex justify-between -mt-0.5 leading-none">
+    <span className="text-white/40 text-[10px] leading-none">{formatTime(currentPosition)}</span>
+    <span className="text-white/40 text-[10px] leading-none">{formatTime(duration)}</span>
   </div>
   </div>
   </div>
