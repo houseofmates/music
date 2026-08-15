@@ -191,9 +191,19 @@ const handleSwipeBack = useCallback(() => {
     if (typeof window === 'undefined') return;
 
     // Platform & Viewport
-    const isNative = window.Capacitor?.isNativePlatform?.() || 
-      (/android|iphone|ipad|ipod/i.test(navigator.userAgent) && window.location.protocol === 'capacitor:');
-    document.body.classList.toggle('native-app', isNative);
+    // Primary check: Capacitor JS bridge is injected by the native runtime
+    // whenever the app runs inside the APK's WebView.
+    const detectNative = () => {
+      if (typeof window === 'undefined') return false;
+      if (window.Capacitor?.isNativePlatform?.()) return true;
+      if (window.Capacitor && /android|iphone|ipad|ipod/i.test(navigator.userAgent)) return true;
+      return false;
+    };
+    const markNative = () => document.body.classList.toggle('native-app', detectNative());
+
+    markNative();
+    // Retry after a short delay in case Capacitor initializes asynchronously
+    const timeout = setTimeout(markNative, 500);
 
     const mediaQuery = window.matchMedia('(min-width: 768px)');
     const handleViewport = (e) => setIsDesktopViewport(e.matches);
