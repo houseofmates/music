@@ -420,6 +420,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
     const val = parseFloat(e.target.value);
     const dur = liveDuration();
     if (dur > 0) seekTo((val / 100) * dur);
+    e.target.style.setProperty('--progress', val + '%');
   }}
  />
  <span className="text-white/40 text-xs flex-shrink-0">{formatTime(duration)}</span>
