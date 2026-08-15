@@ -751,3 +751,10 @@ input[type="range"]::-ms-thumb {
 /* Safe area insets for native mobile — placed after @tailwind utilities so they override py-* etc. */
 .pt-safe { padding-top: env(safe-area-inset-top, 20px); }
 .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+
+/* Eliminate any visible outline around the bottom player strip / nav */
+nav, .mobile-player-strip, .mobile-player-strip > div {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
