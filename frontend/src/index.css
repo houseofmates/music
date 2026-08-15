@@ -508,6 +508,15 @@ input[type="range"]::-moz-range-thumb {
   min-height: 0;
 }
 
+/* Kill native browser highlight/outline on the mobile seek bar */
+.mobile-player-strip .progress-range {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  accent-color: #f6b012 !important;
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
