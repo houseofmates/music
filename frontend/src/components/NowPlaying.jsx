@@ -275,18 +275,29 @@ export default function NowPlaying({ onClose }) {
 
   const duration = audioDuration || currentTrack?.duration || 0;
 
-  const trackRef = useRef(null);
-  const fillRef = useRef(null);
-  const thumbRef = useRef(null);
+  const rangeRef = useRef(null);
+  const interactingRef = useRef(false);
 
-  const { isDraggingRef } = useProgressDrag({
-    getDuration: liveDuration,
-    getCurrentPosition: livePosition,
-    onSeek: seekTo,
-    trackRef,
-    fillRef,
-    thumbRef,
-  });
+  // rAF loop: updates --progress CSS variable on the range input
+  // so the fill follows playback. Skips updates while user drags.
+  useEffect(() => {
+    const input = rangeRef.current;
+    if (!input) return;
+
+    let raf;
+    const tick = () => {
+      const dur = liveDuration();
+      if (dur > 0 && !interactingRef.current) {
+        const pos = livePosition();
+        const pct = Math.max(0, Math.min(100, (pos / dur) * 100));
+        input.value = pct;
+        input.style.setProperty('--progress', pct + '%');
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   const handleVolumeChange = (e) => {
     e.stopPropagation();
