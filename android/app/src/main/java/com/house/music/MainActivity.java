@@ -82,6 +82,9 @@ public class MainActivity extends BridgeActivity {
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
 
+        // Make webview content extend into the status bar area (no inset padding)
+        getWindow().setStatusBarColor(android.graphics.Color.TRANSPARENT);
+
         MusicWidgetProvider.updateAllWidgets(this);
         requestBatteryOptimizationExemption();
     }
