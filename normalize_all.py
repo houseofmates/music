@@ -4,8 +4,8 @@
 import sys
 import os
 
-os.chdir('/home/house/projects/music')
-sys.path.insert(0, '/home/house/projects/music/backend')
+os.chdir(os.getenv('MUSIC_ROOT', os.path.expanduser('~/projects/music')))
+sys.path.insert(0, os.path.join(os.getenv('MUSIC_ROOT', os.path.expanduser('~/projects/music')), 'backend'))
 
 import config
 config.settings.database_url = "sqlite:///./music.db"

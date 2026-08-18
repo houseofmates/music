@@ -1,4 +1,12 @@
-with open('/home/house/projects/music/android/app/src/main/java/com/house/music/MainActivity.java', 'r') as f:
+#!/usr/bin/env python3
+import os
+import sys
+from pathlib import Path
+
+MUSIC_ROOT = os.getenv('MUSIC_ROOT', str(Path.home() / 'projects/music'))
+sys.path.insert(0, str(Path(MUSIC_ROOT)))
+
+with open(f'{MUSIC_ROOT}/android/app/src/main/java/com/house/music/MainActivity.java', 'r') as f:
     content = f.read()
 
 old = '''            @Override
@@ -43,7 +51,7 @@ new = '''            @Override
 
 if old in content:
     content = content.replace(old, new)
-    with open('/home/house/projects/music/android/app/src/main/java/com/house/music/MainActivity.java', 'w') as f:
+    with open(f'{MUSIC_ROOT}/android/app/src/main/java/com/house/music/MainActivity.java', 'w') as f:
         f.write(content)
     print('patched MainActivity')
 else:

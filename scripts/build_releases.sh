@@ -75,7 +75,7 @@ if [ -d "frontend" ]; then
   echo "Prepping frontend for production build..."
   pushd frontend > /dev/null
 
-  export VITE_API_URL="https://music.houseofmates.space/api"
+  export VITE_API_URL="${VITE_API_DOMAIN}/api"
   export VITE_APP_VERSION="$RELEASE_VERSION"
   export VITE_BUILD_MODE="production"
 
@@ -219,7 +219,7 @@ if [ -d "frontend" ]; then
       npm install || { echo "ERROR: npm install failed"; exit 1; }
     fi
 
-    export VITE_API_URL="https://music.houseofmates.space/api"
+    export VITE_API_URL="${VITE_API_DOMAIN}/api"
     npm run build || { echo "ERROR: web build failed"; exit 1; }
     popd > /dev/null
   fi

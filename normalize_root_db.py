@@ -5,8 +5,8 @@ import sys
 import os
 
 # Use the root-level database
-os.chdir('/home/house/projects/music')
-sys.path.insert(0, '/home/house/projects/music/backend')
+os.chdir(os.getenv('MUSIC_ROOT', os.path.expanduser('~/projects/music')))
+sys.path.insert(0, os.path.join(os.getenv('MUSIC_ROOT', os.path.expanduser('~/projects/music')), 'backend'))
 
 # Override the database URL to use root music.db
 import config
