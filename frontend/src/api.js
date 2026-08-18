@@ -13,7 +13,10 @@ const isAndroidNative =
   window.Capacitor.getPlatform() === 'android';
 
 const explicitApiUrlRaw = import.meta.env.VITE_API_URL?.trim() || '';
-const DEFAULT_PROD_API_URL = 'https://music.houseofmates.space/api';
+// production api base, derived from the configured domain (empty = fall back to /api)
+const DEFAULT_PROD_API_URL = import.meta.env.VITE_API_DOMAIN
+  ? `${import.meta.env.VITE_API_DOMAIN}/api`
+  : '';
 
 // In development ignore a VITE_API_URL that points to the production server so the dev server
 // uses the local proxy (/api) by default. This avoids accidentally pointing the local browser
@@ -28,7 +31,7 @@ const getFallbackApiBases = () => {
   // AppImage/Electron (file://) - use production server since no local backend
   if (isFileProtocol) {
     return [
-      DEFAULT_PROD_API_URL,
+      DEFAULT_PROD_API_BASE,
     ];
   }
 
@@ -45,14 +48,14 @@ const getFallbackApiBases = () => {
   if (isWebBrowser) {
     return [
       '/api',
-      DEFAULT_PROD_API_URL,
+      DEFAULT_PROD_API_BASE,
     ];
   }
 
   return [
     '/api',
-    DEFAULT_PROD_API_URL,
-    'https://music.houseofmates.space/api',
+    DEFAULT_PROD_API_BASE,
+    DEFAULT_PROD_API_BASE,
   ];
 };
 
@@ -86,7 +89,7 @@ const safeExplicitApiUrl = explicitApiUrl && isSafeBrowserApiUrl(explicitApiUrl)
 const apiBases = safeExplicitApiUrl
   ? [safeExplicitApiUrl, ...fallbackApiBases.filter((base) => base !== safeExplicitApiUrl)]
   : isFileProtocol
-    ? [explicitApiUrl || DEFAULT_PROD_API_URL, ...fallbackApiBases.filter(b => b !== (explicitApiUrl || DEFAULT_PROD_API_URL))].filter(Boolean)
+    ? [explicitApiUrl || DEFAULT_PROD_API_BASE, ...fallbackApiBases.filter(b => b !== (explicitApiUrl || DEFAULT_PROD_API_URL))].filter(Boolean)
     : [...fallbackApiBases, ...(!fallbackApiBases.includes(explicitApiUrl) && explicitApiUrl ? [explicitApiUrl] : [])];
 
 let activeApiBaseIndex = 0;
@@ -106,7 +109,7 @@ const resolveApiBase = () => {
     return cachedBaseUrl;
   }
 
-  const fallbackOrigin = typeof window !== 'undefined' ? window.location.origin : 'https://music.houseofmates.space';
+  const fallbackOrigin = typeof window !== 'undefined' ? window.location.origin : DEFAULT_PROD_API_URL;
   try {
     cachedBaseUrl = new URL(api.defaults.baseURL, fallbackOrigin);
   } catch {
