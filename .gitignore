@@ -47,6 +47,14 @@ android/key.properties
 android/local.properties
 *.keystore
 *.jks
+android/build/
+android/app/build/
+android/.gradle/
+android/capacitor-cordova-android-plugins/build/
+android/app/src/main/assets/dist/
+android/app/src/main/assets/public/
+frontend/build_output.txt
+frontend/tsconfig.tsbuildinfo
 
 # Tooling / agent state
 .kilo/
@@ -91,5 +99,3 @@ keystore.properties
 node_modules/
 __pycache__/
 .DS_Store
-android/.gradle/
-android/app/build/
