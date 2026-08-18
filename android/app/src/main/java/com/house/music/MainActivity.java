@@ -17,6 +17,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.getcapacitor.BridgeActivity;
+import com.house.music.BuildConfig;
 
 public class MainActivity extends BridgeActivity {
     private static final String PREFS_NAME = "music_prefs";
@@ -145,7 +146,7 @@ public class MainActivity extends BridgeActivity {
                 // If the WebView navigates away from local assets (e.g. Capacitor
                 // or react-router tries to load http://localhost after startup),
                 // immediately cancel the load and return to the bundled index.html.
-                if (url != null && !url.startsWith("file://") && !url.startsWith("https://music.houseofmates.space")) {
+                if (url != null && !url.startsWith("file://") && !startsProdUrl(url)) {
                     if (!isRedirecting) {
                         isRedirecting = true;
                         view.stopLoading();
@@ -166,7 +167,7 @@ public class MainActivity extends BridgeActivity {
                 // to prevent the app from navigating away from bundled assets.
                 if (url == null) return true;
                 if (url.startsWith("file://")) return false;
-                if (url.startsWith("https://music.houseofmates.space")) return false;
+                if (startsProdUrl(url)) return false;
                 
                 // Block any other URL and reload local assets
                 view.loadUrl("file:///android_asset/public/index.html");
@@ -185,6 +186,12 @@ public class MainActivity extends BridgeActivity {
         });
         
         isWebViewInitialized = true;
+    }
+
+    private boolean startsProdUrl(String url) {
+        if (url == null) return false;
+        if (BuildConfig.API_DOMAIN.isEmpty()) return false;
+        return url.startsWith("https://" + BuildConfig.API_DOMAIN);
     }
 
     private void requestBatteryOptimizationExemption() {
