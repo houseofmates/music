@@ -31,7 +31,7 @@ const getFallbackApiBases = () => {
   // AppImage/Electron (file://) - use production server since no local backend
   if (isFileProtocol) {
     return [
-      DEFAULT_PROD_API_BASE,
+      DEFAULT_PROD_API_URL,
     ];
   }
 
@@ -48,14 +48,14 @@ const getFallbackApiBases = () => {
   if (isWebBrowser) {
     return [
       '/api',
-      DEFAULT_PROD_API_BASE,
+      DEFAULT_PROD_API_URL,
     ];
   }
 
   return [
     '/api',
-    DEFAULT_PROD_API_BASE,
-    DEFAULT_PROD_API_BASE,
+    DEFAULT_PROD_API_URL,
+    DEFAULT_PROD_API_URL,
   ];
 };
 
@@ -89,7 +89,7 @@ const safeExplicitApiUrl = explicitApiUrl && isSafeBrowserApiUrl(explicitApiUrl)
 const apiBases = safeExplicitApiUrl
   ? [safeExplicitApiUrl, ...fallbackApiBases.filter((base) => base !== safeExplicitApiUrl)]
   : isFileProtocol
-    ? [explicitApiUrl || DEFAULT_PROD_API_BASE, ...fallbackApiBases.filter(b => b !== (explicitApiUrl || DEFAULT_PROD_API_URL))].filter(Boolean)
+    ? [explicitApiUrl || DEFAULT_PROD_API_URL, ...fallbackApiBases.filter(b => b !== (explicitApiUrl || DEFAULT_PROD_API_URL))].filter(Boolean)
     : [...fallbackApiBases, ...(!fallbackApiBases.includes(explicitApiUrl) && explicitApiUrl ? [explicitApiUrl] : [])];
 
 let activeApiBaseIndex = 0;
