@@ -11,7 +11,7 @@
 
 ### 1. Navigate to Project
 ```bash
-cd /home/house/projects/music
+cd ${PROJECT_ROOT}
 ```
 
 ### 2. Configure (Optional but Recommended)
@@ -29,7 +29,7 @@ cp .env.example .env
 ### 3. Start Application
 ```bash
 # From project root
-cd /home/house/projects/music
+cd ${PROJECT_ROOT}
 
 # Quick start (automated)
 ./setup.sh

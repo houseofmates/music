@@ -76,4 +76,4 @@ this is a home system running at home. the cloudflare tunnel option (update-clou
 
 <h1 align="center">license</h1>
 
-<a href="file:///home/house/license_templates/mates_license.md">the mates license</a>
+<a href="file://${HOME}/license_templates/mates_license.md">the mates license</a>

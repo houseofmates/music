@@ -100,7 +100,7 @@ use the official mobile app with the passcode authentication or jwt tokens.
 
 ============================= test session starts ==============================
 platform linux -- Python 3.14.3, pytest-9.0.3, pluggy-1.6.0
-rootdir: /home/house
+rootdir: ${HOME}
 configfile: pyproject.toml
 plugins: anyio-4.13.0, xdist-3.8.0, asyncio-1.3.0
 asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
