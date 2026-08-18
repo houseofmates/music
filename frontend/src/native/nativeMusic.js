@@ -7,7 +7,7 @@ const STATE = {
 };
 
 // Production API base URL for Android native player
-const PROD_API_BASE = 'https://music.houseofmates.space/api';
+const PROD_API_BASE = import.meta.env.VITE_API_DOMAIN ? `${import.meta.env.VITE_API_DOMAIN}/api` : '/api';
 
 class NativeMusic {
   constructor() {

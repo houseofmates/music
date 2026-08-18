@@ -140,7 +140,7 @@ const VoiceSearch = ({ onResults, setSearchQuery, placeholder = "Tap to search w
                 const formData = new FormData();
                 formData.append('file', audioBlob, 'recording.webm');
                 
-                const response = await fetch('http://192.168.4.250:5000/transcribe', {
+                const response = await fetch(import.meta.env.VITE_TRANSCRIBE_URL || 'http://localhost:5000/transcribe', {
                   method: 'POST',
                   body: formData,
                 });

@@ -30,7 +30,7 @@ SERVICE_FILE="$REPO_ROOT/music.service"
 if [ ! -f "$SERVICE_FILE" ]; then
     echo "❌ music.service not found"
     echo "   Looked in: $REPO_ROOT/music.service"
-    echo "   and: /home/house/projects/music/music.service"
+    echo "   and: $REPO_ROOT/music.service"
     exit 1
 fi
 

@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euo pipefail
-cd /home/house/projects/music
+cd "${MUSIC_ROOT:-$(dirname "$0")}"
 
 export GIT_TERMINAL_PROMPT=0
-git config user.email "house@houseofmates.space" >/dev/null 2>&1 || true
+git config user.email "${GIT_SYNC_EMAIL:-pkm-sync@localhost}" >/dev/null 2>&1 || true
 git config user.name "pkm-sync" >/dev/null 2>&1 || true
 git config pull.rebase true >/dev/null 2>&1 || true
 

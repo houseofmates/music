@@ -4,12 +4,12 @@ After=network.target
 
 [Service]
 Type=simple
-User=house
-WorkingDirectory=/home/house/projects/music/backend
-ExecStart=/usr/bin/python3 /home/house/projects/music/backend/auto_commit.py
+User=%U
+WorkingDirectory=%h/projects/music/backend
+ExecStart=/usr/bin/python3 %h/projects/music/backend/auto_commit.py
 Restart=always
 RestartSec=10
-Environment=PYTHONPATH=/home/house/projects/music/backend
+Environment=PYTHONPATH=%h/projects/music/backend
 
 [Install]
 WantedBy=multi-user.target

@@ -37,14 +37,14 @@ fi
 # Backup current config
 sudo cp /etc/cloudflared/config.yml /etc/cloudflared/config.yml.backup.$(date +%Y%m%d_%H%M%S)
 
-# Update the music.houseofmates.space line to point to target port
+# update the ${PKM_DOMAIN} line to point to target port
 sudo sed -i "s|service: http://127.0.0.1:${SOURCE_PORT}|service: http://127.0.0.1:${TARGET_PORT}|g" /etc/cloudflared/config.yml
 
 echo "Restarting cloudflared service..."
 sudo systemctl restart cloudflared
 
 echo ""
-echo "✓ Updated music.houseofmates.space to use port $TARGET_PORT (nginx proxy)"
+echo "✓ Updated ${PKM_DOMAIN} to use port $TARGET_PORT (nginx proxy)"
 echo "✓ Port $TARGET_PORT now properly proxies /api requests to backend"
 echo ""
 echo "Verify with: sudo systemctl status cloudflared"
