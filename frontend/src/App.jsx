@@ -252,7 +252,7 @@ const handleSwipeBack = useCallback(() => {
 
 
   // Note: Syncing play/pause state is now handled inside AppLifecycleManager
-  // to check continuity in background states.
+  // to make sure continuity in background states.
 
 
 

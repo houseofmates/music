@@ -41,7 +41,7 @@ export default function ContextMenu({
     };
   }, [onClose]);
 
-  // Calculate position after mount to check menu fits on screen
+  // Calculate position after mount to make sure menu fits on screen
   useEffect(() => {
     if (!menuRef.current) return;
     

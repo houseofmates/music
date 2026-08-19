@@ -234,7 +234,7 @@ export default function LyricsPanel({ track, embedded }) {
       if (e.response?.status === 401) {
         showToast("Please log in to save lyrics.", "error");
       } else {
-        showToast("Failed to save lyrics. Please check your connection.", "error");
+        showToast("Failed to save lyrics. Please make sure your connection.", "error");
       }
     } finally {
       setSaving(false);

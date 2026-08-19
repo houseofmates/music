@@ -518,7 +518,7 @@ class ContextualQueueManager:
             
             scored_candidates.append({
                 **candidate,
-                'score': max(0, score)  # check non-negative
+                'score': max(0, score)  # clamp to non-negative
             })
         
         # sort by score
@@ -560,7 +560,7 @@ class ContextualQueueManager:
         return False
     
     async def _apply_diversity_filter(self, scored_candidates: List[Dict], queue_size: int) -> List[Dict]:
-        """apply advanced diversity filter to check varied and contextual recommendations."""
+        """apply advanced diversity filter to make sure varied and contextual recommendations."""
         if not scored_candidates:
             return []
 
