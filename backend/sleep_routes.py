@@ -23,7 +23,7 @@ from auth import get_current_user_optional
 router = APIRouter()
 
 
-# ============= AMBIENT SOUNDS =============
+# ambient sounds
 
 @router.get("/ambient-sounds", response_model=List[AmbientSoundResponse])
 def get_ambient_sounds(session: Session = Depends(get_session)):
@@ -62,7 +62,7 @@ def update_ambient_sound(
     return {"message": "Ambient sound updated"}
 
 
-# ============= SLEEP TIMERS =============
+# sleep timers
 
 @router.post("/sleep-timer", response_model=SleepTimerResponse)
 def create_sleep_timer(
@@ -117,7 +117,7 @@ def get_sleep_timer_history(
     return [SleepTimerResponse.model_validate(timer) for timer in timers]
 
 
-# ============= SLEEP PLAYLISTS =============
+# sleep playlists
 
 @router.post("/sleep-playlists", response_model=SleepPlaylistResponse)
 def create_sleep_playlist(
