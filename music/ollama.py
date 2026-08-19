@@ -56,7 +56,7 @@ def parse_prompt(prompt: str) -> Dict[str, Any]:
         if start >= 0:
             out = out[start:]
         return json.loads(out)
-    except Exception:
+    except Exception as exc:
         return {"keywords": [], "mood": "", "tempo": ""}
 
 

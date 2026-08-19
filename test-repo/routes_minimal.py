@@ -178,7 +178,7 @@ async def get_tracks(
         valid_tracks = [track for track in tracks if _file_exists(track.file_path)]
         return [_to_track_dict(track) for track in valid_tracks]
 
-    except Exception:
+    except Exception as exc:
         logger.exception("Error in get_tracks")
         raise HTTPException(status_code=500, detail="Failed to retrieve tracks")
 
@@ -242,7 +242,7 @@ async def get_albums(
 
         return result
 
-    except Exception:
+    except Exception as exc:
         logger.exception("Error in get_albums")
         raise HTTPException(status_code=500, detail="Failed to retrieve albums")
 
@@ -268,7 +268,7 @@ async def get_artists(
         artists = session.exec(artists_query).all()
         return [artist for artist in artists if artist]
 
-    except Exception:
+    except Exception as exc:
         logger.exception("Error in get_artists")
         raise HTTPException(status_code=500, detail="Failed to retrieve artists")
 
@@ -321,7 +321,7 @@ async def get_playlists(
 
         return result
 
-    except Exception:
+    except Exception as exc:
         logger.exception("Error in get_playlists")
         raise HTTPException(status_code=500, detail="Failed to retrieve playlists")
 

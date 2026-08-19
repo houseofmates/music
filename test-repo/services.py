@@ -383,7 +383,7 @@ class MetadataService:
                     raw = base64.b64decode(encoded_picture)
                     encoded = base64.b64encode(raw).decode("utf-8")
                     return f"data:image/jpeg;base64,{encoded}"
-                except Exception:
+                except Exception as exc:
                     return None
 
             return None

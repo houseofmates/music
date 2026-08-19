@@ -385,7 +385,7 @@ class MetadataService:
                     raw = base64.b64decode(encoded_picture)
                     encoded = base64.b64encode(raw).decode("utf-8")
                     return f"data:image/jpeg;base64,{encoded}"
-                except Exception:
+                except Exception as exc:
                     return None
 
             return None
@@ -1302,7 +1302,7 @@ class LibraryService:
                         # Re-fetch track from session to avoid stale-object / lazy-load issues
                         try:
                             track_id = track.id          # fast path if object is still fresh
-                        except Exception:
+                        except Exception as exc:
                             # Expired / detached object - pull primary key from instance state directly
                             track_id = track.__dict__.get('id')
                         if track_id is None:

@@ -76,7 +76,7 @@ def create_sleep_timer(
         return SleepTimerResponse.model_validate(timer)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception:
+    except Exception as exc:
         logger.exception("Failed to create sleep timer")
         raise HTTPException(status_code=400, detail="Failed to create sleep timer")
 
@@ -191,7 +191,7 @@ def create_sleep_schedule(
         return SleepScheduleResponse.model_validate(schedule)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception:
+    except Exception as exc:
         logger.exception("Failed to create sleep schedule")
         raise HTTPException(status_code=400, detail="Failed to create sleep schedule")
 
@@ -251,7 +251,7 @@ def create_alarm(
         return AlarmResponse.model_validate(alarm)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception:
+    except Exception as exc:
         logger.exception("Failed to create alarm")
         raise HTTPException(status_code=400, detail="Failed to create alarm")
 

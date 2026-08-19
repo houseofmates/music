@@ -281,7 +281,7 @@ class DeepDiscoveryService:
             # Note: This would require Last.fm API key
             # For now, return empty list
             return []
-        except Exception:
+        except Exception as exc:
             return []
 
     async def save_artist_metadata(self, artist_name: str, artist_data: Dict):

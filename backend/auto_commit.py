@@ -64,7 +64,7 @@ class AutoCommitHandler(FileSystemEventHandler):
                 capture_output=True
             )
             return result.returncode == 0
-        except Exception:
+        except Exception as exc:
             return False
 
     def _reset_timer(self):
