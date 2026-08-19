@@ -335,7 +335,7 @@ input, textarea {
   will-change: transform;
 }
 
-/* Touch-friendly – apply tap targets only to nav/page buttons, not player inline controls */
+/* Touch-friendly - apply tap targets only to nav/page buttons, not player inline controls */
 button, a {
   -webkit-tap-highlight-color: transparent;
 }
@@ -414,7 +414,7 @@ input[type="range"]::-moz-range-thumb {
   border: 2px solid rgba(255, 255, 255, 0.8);
 }
 
-/* Player progress bar — range input with CSS variable fill */
+/* Player progress bar - range input with CSS variable fill */
 .progress-range {
   -webkit-appearance: none;
   appearance: none;
@@ -757,13 +757,13 @@ input[type="range"]::-ms-thumb {
  word-break: break-word;
 }
 
-/* Safe area insets for native mobile — placed after @tailwind utilities so they override py-* etc. */
+/* Safe area insets for native mobile - placed after @tailwind utilities so they override py-* etc. */
 .pt-safe { padding-top: 0 !important; }
-/* Neutralize the bottom safe-area inset entirely — on Android env(safe-area-inset-bottom)
+/* Neutralize the bottom safe-area inset entirely - on Android env(safe-area-inset-bottom)
    reports a large value (24px+) that no child padding can offset. We handle spacing ourselves. */
 .pb-safe { padding-bottom: 0px !important; }
 
-/* Override safe-area insets for the bottom nav — we handle this ourselves */
+/* Override safe-area insets for the bottom nav - we handle this ourselves */
 nav {
   padding-bottom: env(safe-area-inset-bottom, 0px) !important;
   --safe-area-inset-bottom: 0px;
