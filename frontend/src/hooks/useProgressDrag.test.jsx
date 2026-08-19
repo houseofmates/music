@@ -14,7 +14,7 @@ vi.mock('../store', () => ({
 
 const DURATION = 100;
 
-function Harness({ onSeek, enabled = true }) {
+function use({ onSeek, enabled = true }) {
   const trackRef = useRef(null);
   const fillRef = useRef(null);
   const thumbRef = useRef(null);
@@ -36,7 +36,7 @@ function Harness({ onSeek, enabled = true }) {
 }
 
 function mountWithRect(onSeek) {
-  const utils = render(<Harness onSeek={onSeek} />);
+  const utils = render(<use onSeek={onSeek} />);
   const track = utils.getByTestId('track');
   // The visible bar is 200px wide starting at x=0.
   track.getBoundingClientRect = () => ({
@@ -112,7 +112,7 @@ describe('useProgressDrag', () => {
       ? vi.spyOn(window, 'requestAnimationFrame')
       : null;
     const add = vi.spyOn(window, 'addEventListener');
-    const { getByTestId } = render(<Harness onSeek={onSeek} enabled={false} />);
+    const { getByTestId } = render(<use onSeek={onSeek} enabled={false} />);
 
     fireEvent.pointerDown(getByTestId('track'), { clientX: 0, pointerId: 1, button: 0 });
 

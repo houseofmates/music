@@ -263,7 +263,7 @@ public class MainActivity extends BridgeActivity {
     public void onStop() {
         super.onStop();
         
-        // Also ensure WebView stays alive through onStop for background playback
+        // Also check WebView stays alive through onStop for background playback
         if (getBridge() != null && getBridge().getWebView() != null) {
             WebView webView = getBridge().getWebView();
             webView.resumeTimers();

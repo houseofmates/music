@@ -147,7 +147,7 @@ export const usePlayerStore = create((set, get) => ({
     }
   },
 
-  // Network monitoring for seamless handoffs
+  // Network monitoring for smooth handoffs
   startNetworkMonitoring: () => {
     const monitorConnection = () => {
       const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -285,7 +285,7 @@ export const usePlayerStore = create((set, get) => ({
   handleNetworkReconnect: () => {
     const { currentTrack, isPlaying, audioRef } = get();
     
-    // If we have a track and it's supposed to be playing, ensure it's active
+    // If we have a track and it's supposed to be playing, check it's active
     if (currentTrack && isPlaying && audioRef) {
       if (audioRef.paused || audioRef.error || audioRef.readyState < 2) {
         // If we were on a blob (offline fallback), maybe stay on it until track ends

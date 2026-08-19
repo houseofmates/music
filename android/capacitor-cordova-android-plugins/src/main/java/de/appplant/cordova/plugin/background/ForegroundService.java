@@ -331,7 +331,7 @@ public class ForegroundService extends Service {
 
         Notification notification = makeNotification(settings);
         
-        // Use startForeground to ensure service stays in foreground state
+        // Use startForeground to check service stays in foreground state
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(NOTIFICATION_ID, notification,
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);

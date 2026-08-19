@@ -280,12 +280,12 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
  {currentTrack && !isPlayerHidden && (
  <p
  className="text-white text-base leading-tight overflow-hidden text-ellipsis whitespace-nowrap"
- title={`${currentTrack.title || currentTrack.filename}${currentTrack.artist ? ` — ${currentTrack.artist}` : ''}`}
+ title={`${currentTrack.title || currentTrack.filename}${currentTrack.artist ? ` - ${currentTrack.artist}` : ''}`}
  >
  {(() => {
  const title = currentTrack.title || currentTrack.filename || '';
  const artist = currentTrack.artist || '';
- return artist ? `${title} — ${artist}` : title;
+ return artist ? `${title} - ${artist}` : title;
  })()}
  </p>
  )}
@@ -480,7 +480,7 @@ export default function BottomNav({ onRevealPlayer, isPlayerHidden = false }) {
 
 {/* Controls + progress live in a flex column. Flex `gap` never collapses,
     so the fixed vertical gap between the controls row and the progress bar
-    is guaranteed regardless of button sizes — the play button can never
+    is guaranteed regardless of button sizes - the play button can never
     overlap the progress bar on any screen size. */}
   <div className="flex flex-col gap-0 px-1.5 py-0">
    {/* Controls row */}

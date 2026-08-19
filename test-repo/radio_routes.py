@@ -68,7 +68,7 @@ def get_discover_radio(
             genre_groups[genre] = []
         genre_groups[genre].append(track)
     
-    # Sample from each genre to ensure variety
+    # Sample from each genre to check variety
     selected_tracks = []
     tracks_per_genre = max(1, limit // len(genre_groups))
     

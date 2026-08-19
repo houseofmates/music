@@ -1136,7 +1136,7 @@ class LibraryService:
                             metadata['featured_artists'] = featured
 
                         if existing_track:
-                            # update existing – don't overwrite fields that already
+                            # update existing - don't overwrite fields that already
                             # have a value with None (e.g. cover_art_url fetched
                             # from an external source shouldn't be wiped when the
                             # file itself has no embedded art).

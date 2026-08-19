@@ -1,6 +1,6 @@
 """deep discovery service for enhanced metadata and artist information.
 
-this module provides comprehensive metadata enrichment including:
+this module provides broad metadata enrichment including:
 - high-resolution artist bios and images
 - album artwork from multiple sources
 - lyrics fetching and synchronization
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 
 
 class DeepDiscoveryService:
-    """comprehensive metadata discovery and enrichment service."""
+    """broad metadata discovery and enrichment service."""
     
     def __init__(self):
         self.session = None
@@ -53,7 +53,7 @@ class DeepDiscoveryService:
         return self.session
     
     async def enrich_track_metadata(self, track_id: int) -> Dict:
-        """comprehensive metadata enrichment for a track."""
+        """broad metadata enrichment for a track."""
         with Session(engine) as session:
             track = session.exec(select(Track).where(Track.id == track_id)).first()
             if not track:
@@ -96,7 +96,7 @@ class DeepDiscoveryService:
             return enrichment
     
     async def get_artist_information(self, artist_name: str) -> Dict:
-        """get comprehensive artist information."""
+        """get broad artist information."""
         try:
             # Check if we have cached data
             with Session(engine) as session:
@@ -379,7 +379,7 @@ class DeepDiscoveryService:
             logger.error("Error saving album metadata: %s", e)
     
     async def get_album_information(self, artist_name: str, album_name: str) -> Dict:
-        """get comprehensive album information."""
+        """get broad album information."""
         try:
             # Check if we have cached data
             with Session(engine) as session:

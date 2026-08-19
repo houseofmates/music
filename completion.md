@@ -12,7 +12,7 @@
 - **Backend:** Python FastAPI with SQLite database
 - **Frontend:** React with Vite and Tailwind CSS
 - **Docker:** Production-ready containerization
-- **Documentation:** Comprehensive guides and references
+- **Documentation:** broad guides and references
 
 ---
 
@@ -193,7 +193,7 @@ The file watcher will automatically:
 → Read [QUICKSTART.md](QUICKSTART.md) for basic usage
 
 ### Full Documentation
-→ Read [README.md](README.md) for comprehensive guide
+→ Read [README.md](README.md) for broad guide
 
 ### Design Guidelines
 → Read [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) for UI/UX rules
@@ -239,7 +239,7 @@ docker-compose ps
 Every feature requested has been implemented with production-quality code.
 
 ### 2. **Strict Design System**
-The design system is not just documented—it's enforced in every component.
+The design system is not just documented-it's enforced in every component.
 
 ### 3. **Background Worker**
 The file watcher is a sophisticated piece of software that handles:
@@ -264,7 +264,7 @@ Every component is designed for touch:
 - Docker containerization
 - Nginx reverse proxy
 - Environment-based configuration
-- Comprehensive error handling
+- broad error handling
 - SQL injection protection
 
 ---
@@ -446,7 +446,7 @@ You now have a **complete, production-ready music player** with:
 ✅ Persistent queue and player state  
 ✅ External metadata enrichment  
 ✅ Docker deployment  
-✅ Comprehensive documentation  
+✅ broad documentation  
 
 **Everything is ready to go!**
 
@@ -503,7 +503,7 @@ docker-compose ps
 
 ## 🎵 Final Words
 
-**Vibecode** is more than just a music player—it's a complete ecosystem for managing and enjoying your music collection. Every detail has been carefully designed and implemented to provide the best possible experience.
+**Vibecode** is more than just a music player-it's a complete toolchain for managing and enjoying your music collection. Every detail has been carefully designed and implemented to provide the best possible experience.
 
 The code is clean, well-documented, and production-ready. The design is consistent, beautiful, and functional. The deployment is simple and reliable.
 

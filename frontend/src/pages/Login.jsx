@@ -71,7 +71,7 @@ export default function Login() {
             disabled={loading}
             className="w-full rounded-xl bg-vibe-gold py-3 text-black font-semibold hover:bg-yellow-500 transition"
           >
-            {loading ? 'working…' : mode === 'login' ? 'sign in' : 'create account'}
+            {loading ? 'working...' : mode === 'login' ? 'sign in' : 'create account'}
           </button>
         </form>
         <div className="mt-4 text-center text-sm text-white/70">

@@ -70,7 +70,7 @@ const AppLifecycleManager = () => {
     return state?.audioRef ?? mainAudioRef.current;
   }, [getSafeState]);
 
-  // 1. Initialize Main Audio Elements (Main & Crossfade) — skip when native handles playback
+  // 1. Initialize Main Audio Elements (Main & Crossfade) - skip when native handles playback
   useEffect(() => {
     if (typeof document === 'undefined') return;
     if (nativeMusic.isAvailable) return;
@@ -563,7 +563,7 @@ const AppLifecycleManager = () => {
     };
   }, [currentTrack, isPlaying, currentPosition, getSafeState]);
 
-  // 7. Native State Listener — forwards native playback events to the store
+  // 7. Native State Listener - forwards native playback events to the store
   useEffect(() => {
     if (!nativeMusic.isAvailable) return;
 

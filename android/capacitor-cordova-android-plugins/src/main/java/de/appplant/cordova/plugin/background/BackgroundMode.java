@@ -165,7 +165,7 @@ public class BackgroundMode extends CordovaPlugin {
     public void onDestroy()
     {
         // For media apps, only stop the service if background mode has been
-        // explicitly disabled. Never kill the process — doing so destroys the
+        // explicitly disabled. Never kill the process - doing so destroys the
         // foreground service and immediately stops background music playback.
         if (isDisabled) {
             stopService();

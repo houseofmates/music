@@ -204,7 +204,7 @@ function TrackItem({
           draggable={false}
         />
 
-        {/* Action overlay (favorite / download / queue) — desktop only */}
+        {/* Action overlay (favorite / download / queue) - desktop only */}
         <div className="absolute top-0 right-0 hidden md:flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-auto z-50">
           <button
             type="button"

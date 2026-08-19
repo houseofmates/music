@@ -1142,7 +1142,7 @@ class LibraryService:
                             metadata['featured_artists'] = featured
 
                         if existing_track:
-                            # update existing – don't overwrite fields that already
+                            # update existing - don't overwrite fields that already
                             # have a value with None (e.g. cover_art_url fetched
                             # from an external source shouldn't be wiped when the
                             # file itself has no embedded art).
@@ -1303,7 +1303,7 @@ class LibraryService:
                         try:
                             track_id = track.id          # fast path if object is still fresh
                         except Exception:
-                            # Expired / detached object — pull primary key from instance state directly
+                            # Expired / detached object - pull primary key from instance state directly
                             track_id = track.__dict__.get('id')
                         if track_id is None:
                             continue
@@ -1320,7 +1320,7 @@ class LibraryService:
                             emb_stmt = select(TrackEmbedding).where(TrackEmbedding.track_id == track.id)
                             for emb in session.exec(emb_stmt):
                                 session.delete(emb)
-                            # Remove play_history entries — FK has no ON DELETE CASCADE and track_id is NOT NULL
+                            # Remove play_history entries - FK has no ON DELETE CASCADE and track_id is NOT NULL
                             ph_stmt = select(PlayHistory).where(PlayHistory.track_id == track.id)
                             for ph in session.exec(ph_stmt):
                                 session.delete(ph)

@@ -267,7 +267,7 @@ def semantic_search(query: str, session: Session, limit: int = 20) -> list[tuple
         _cleanup_cache()
     
     with _lock:
-        # ensure index exists (skip ensure_embeddings on read path to avoid write contention;
+        # check index exists (skip ensure_embeddings on read path to avoid write contention;
         # embeddings are maintained by background rebuilds and metadata writes)
         
         # load index

@@ -2,7 +2,7 @@ import { useRef, useCallback, useEffect } from 'react';
 import { usePlayerStore } from '../store';
 
 /**
- * useProgressDrag — a single, shared progress-bar interaction hook used by every
+ * useProgressDrag - a single, shared progress-bar interaction hook used by every
  * progress bar in the app (desktop bar, mobile strip, full-screen NowPlaying).
  *
  * Design guarantees:
@@ -10,7 +10,7 @@ import { usePlayerStore } from '../store';
  *  - Pointer Events unify mouse + touch + pen. A single pointerdown handler is
  *    attached to the track element; move/up/cancel listeners live on `window`
  *    ONLY while a drag is active and are removed the instant it ends. When idle,
- *    the hook attaches ZERO document/window listeners — so it can never break
+ *    the hook attaches ZERO document/window listeners - so it can never break
  *    page scrolling (the previous implementation attached a permanent
  *    `document` touchmove listener that called preventDefault on every touch,
  *    freezing all scrolling).
@@ -72,7 +72,7 @@ export function useProgressDrag({
   const handlePointerMove = useCallback((e) => {
     if (!draggingRef.current) return;
     if (activePointerRef.current != null && e.pointerId !== activePointerRef.current) return;
-    // Only meaningful while dragging — safe to prevent scroll/selection here.
+    // Only meaningful while dragging - safe to prevent scroll/selection here.
     if (e.cancelable) e.preventDefault();
     const pct = percentFromClientX(e.clientX);
     if (pct == null) return;

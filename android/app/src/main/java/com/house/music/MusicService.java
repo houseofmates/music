@@ -97,7 +97,7 @@ public class MusicService extends Service
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null || intent.getAction() == null) {
-            // Service restarted after process death — try to resume last track
+            // Service restarted after process death - try to resume last track
             restoreState();
             return START_STICKY;
         }
@@ -144,7 +144,7 @@ public class MusicService extends Service
             int positionMs = prefs.getInt("positionMs", 0);
             int state = prefs.getInt("state", STATE_PAUSED);
 
-            // Only resume if we were playing or paused — not idle/completed/error
+            // Only resume if we were playing or paused - not idle/completed/error
             if (state == STATE_PLAYING || state == STATE_PAUSED) {
                 pendingSeekPosition = positionMs;
                 playUrl(url);

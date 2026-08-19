@@ -1,6 +1,6 @@
 # Voice Control Features
 
-This document describes the comprehensive voice control capabilities added to the music app.
+This document describes the broad voice control capabilities added to the music app.
 
 ## Features Implemented
 

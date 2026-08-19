@@ -30,7 +30,7 @@ echo "Updating Cloudflare tunnel configuration..."
 # Check if cloudflared config exists
 if [ ! -f /etc/cloudflared/config.yml ]; then
     echo "❌ Cloudflared config not found at /etc/cloudflared/config.yml"
-    echo "   Please ensure cloudflared is installed and configured."
+    echo "   Please check cloudflared is installed and configured."
     exit 1
 fi
 

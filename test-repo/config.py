@@ -50,7 +50,7 @@ class Settings(BaseSettings):
             except OSError:
                 self.jwt_secret_key = secrets.token_urlsafe(32)
             logging.warning(
-                "JWT_SECRET_KEY not set — using auto-generated persistent key. "
+                "JWT_SECRET_KEY not set - using auto-generated persistent key. "
                 "Set JWT_SECRET_KEY in your .env file for production security."
             )
     

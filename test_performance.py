@@ -259,7 +259,7 @@ class PerformanceTester:
 
     def run_all_tests(self) -> Dict:
         """Run all performance tests."""
-        print("Starting comprehensive performance tests...\n")
+        print("Starting broad performance tests...\n")
 
         self.test_api_endpoints()
         print()

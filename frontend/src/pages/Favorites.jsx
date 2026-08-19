@@ -44,7 +44,7 @@ export default function Favorites() {
           <div className="space-y-2 mb-4">
             {shouldDeferNetwork && (
               <div className="rounded-2xl border border-red-900 bg-[#2a1515] px-3 py-2 text-sm text-red-100 flex items-center gap-2">
-                <WifiOff className="w-4 h-4" /> offline mode — showing cached likes
+                <WifiOff className="w-4 h-4" /> offline mode - showing cached likes
               </div>
             )}
             {!shouldDeferNetwork && lowDataActive && (
@@ -56,7 +56,7 @@ export default function Favorites() {
         )}
 
         {loading ? (
-          <div className="text-[#888]">loading…</div>
+          <div className="text-[#888]">loading...</div>
         ) : favorites.length === 0 ? (
           <div className="text-white">
             {shouldDeferNetwork ? 'favorites unavailable while offline' : 'no favorites yet'}

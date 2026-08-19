@@ -503,7 +503,7 @@ export default function NowPlaying({ onClose }) {
           </div>
         </div>
 
-        {/* progress bar row — range input for reliable tap + drag seeking */}
+        {/* progress bar row - range input for reliable tap + drag seeking */}
 <div className="flex items-center gap-2 w-full max-w-[280px] select-none shrink-0">
   <span className="text-xs text-white/60 w-10 text-right">{formatTime(currentPosition)}</span>
   <input

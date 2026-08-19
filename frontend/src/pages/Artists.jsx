@@ -104,7 +104,7 @@ export default function Artists() {
             <div className="space-y-2 mb-3">
               {shouldDeferNetwork && (
                 <div className="rounded-2xl border border-red-900 bg-[#2a1515] px-3 py-2 text-sm text-red-100 flex items-center gap-2">
-                  <WifiOff className="w-4 h-4" /> offline mode — showing cached artists
+                  <WifiOff className="w-4 h-4" /> offline mode - showing cached artists
                 </div>
               )}
               {!shouldDeferNetwork && lowDataActive && (

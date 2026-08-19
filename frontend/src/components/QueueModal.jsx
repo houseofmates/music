@@ -299,7 +299,7 @@ export default function QueueModal({ onClose }) {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="search to add songs, albums, playlists…"
+              placeholder="search to add songs, albums, playlists..."
               className="w-full bg-[#111] border border-white/10 rounded-xl pl-9 pr-9 py-2.5 text-sm text-white placeholder-white/30 focus:border-[#f6b012] focus:outline-none"
             />
             {searchQuery && (

@@ -523,7 +523,7 @@ export default function LyricsPanel({ track, embedded }) {
                 >
                   <p className="text-white text-sm font-medium truncate">{r.title}</p>
                   <p className="text-white/60 text-xs truncate">
-                    {r.artist}{r.album ? ` — ${r.album}` : ""}
+                    {r.artist}{r.album ? ` - ${r.album}` : ""}
                   </p>
                   <p className="text-white/40 text-xs truncate">{preview}</p>
                   {r.synced_lyrics && (
@@ -545,7 +545,7 @@ export default function LyricsPanel({ track, embedded }) {
         </div>
       ) : (
         <p className="text-white/40 text-sm text-center py-4">
-          no lyrics yet — search above to find and select lyrics
+          no lyrics yet - search above to find and select lyrics
         </p>
       )}
       {draftLyrics && (

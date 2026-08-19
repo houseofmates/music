@@ -187,7 +187,7 @@ export default function History() {
           <div className="space-y-2 mb-4">
             {shouldDeferNetwork && (
               <div className="rounded-2xl border border-red-900 bg-[#2a1515] px-3 py-2 text-sm text-red-100 flex items-center gap-2">
-                <WifiOff className="w-4 h-4" /> offline mode — showing cached plays
+                <WifiOff className="w-4 h-4" /> offline mode - showing cached plays
               </div>
             )}
             {!shouldDeferNetwork && lowDataActive && (
@@ -199,11 +199,11 @@ export default function History() {
         )}
 
         {loading && !refreshing ? (
-          <div className="text-[#888]">loading…</div>
+          <div className="text-[#888]">loading...</div>
         ) : refreshing ? (
           <div className="text-[#888] flex items-center gap-2">
             <Clock className="h-4 w-4 animate-spin" />
-            refreshing…
+            refreshing...
           </div>
         ) : history.length === 0 ? (
           <div className="text-white">

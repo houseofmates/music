@@ -353,7 +353,7 @@ class AudioFeatures(SQLModel, table=True):
 
 
 class SemanticCache(SQLModel, table=True):
-    """cache for semantic search queries to ensure sub-100ms response times."""
+    """cache for semantic search queries to check sub-100ms response times."""
     __tablename__ = "semantic_cache"
     __table_args__ = (
         Index("idx_semantic_cache_expires", "expires_at"),
