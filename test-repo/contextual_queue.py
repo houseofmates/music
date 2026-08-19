@@ -560,7 +560,7 @@ class ContextualQueueManager:
         return False
     
     async def _apply_diversity_filter(self, scored_candidates: List[Dict], queue_size: int) -> List[Dict]:
-        """apply advanced diversity filter to make sure varied and contextual recommendations."""
+        """apply advanced diversity filter for varied and contextual recommendations."""
         if not scored_candidates:
             return []
 

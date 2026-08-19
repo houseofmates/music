@@ -1,6 +1,6 @@
 """
 Analytics Service for Music App
-Provides broad listening analytics and year-in-review data
+Provides full listening analytics and year-in-review data
 """
 
 from typing import Dict, List, Any, Optional, Tuple
@@ -14,7 +14,7 @@ class AnalyticsService:
     """Service for generating music analytics and insights"""
     
     def generate_year_in_review(self, session: Session, user_id: Optional[int] = None, year: Optional[int] = None) -> Dict[str, Any]:
-        """Generate broad year-in-review analytics"""
+        """Generate full year-in-review analytics"""
         
         if not year:
             year = datetime.now().year
