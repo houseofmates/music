@@ -117,7 +117,7 @@ def get_sleep_timer_history(
     return [SleepTimerResponse.model_validate(timer) for timer in timers]
 
 
-# ============= SLEEP PLAYLISTS =============
+# sleep playlists
 
 @router.post("/sleep-playlists", response_model=SleepPlaylistResponse)
 def create_sleep_playlist(
@@ -177,7 +177,7 @@ def delete_sleep_playlist(
     return {"message": "Sleep playlist deleted"}
 
 
-# ============= SLEEP SCHEDULES =============
+# sleep schedules
 
 @router.post("/sleep-schedules", response_model=SleepScheduleResponse)
 def create_sleep_schedule(
@@ -237,7 +237,7 @@ def delete_sleep_schedule(
     return {"message": "Sleep schedule deleted"}
 
 
-# ============= ALARMS =============
+# alarms
 
 @router.post("/alarms", response_model=AlarmResponse)
 def create_alarm(
