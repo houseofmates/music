@@ -269,7 +269,7 @@ class ScanStatus(BaseModel):
     progress: Optional[str] = None
 
 
-# ============= SLEEP & AMBIENT SCHEMAS =============
+# sleep & ambient schemas
 
 class AmbientSoundResponse(BaseModel):
     """Ambient sound response."""

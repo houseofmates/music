@@ -479,7 +479,7 @@ class ScanLog(SQLModel, table=True):
     status: str = Field(default="running")  # running, completed, failed
 
 
-# ============= SLEEP & AMBIENT FEATURES =============
+# sleep & ambient features
 
 class AmbientMode(str, Enum):
     """Predefined ambient sound modes."""
