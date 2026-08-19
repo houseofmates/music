@@ -12,7 +12,7 @@
 - **Backend:** Python FastAPI with SQLite database
 - **Frontend:** React with Vite and Tailwind CSS
 - **Docker:** Production-ready containerization
-- **Documentation:** broad guides and references
+- **Documentation:** complete guides and references
 
 ---
 
@@ -193,7 +193,7 @@ The file watcher will automatically:
 → Read [QUICKSTART.md](QUICKSTART.md) for basic usage
 
 ### Full Documentation
-→ Read [README.md](README.md) for broad guide
+→ Read [README.md](README.md) for complete guide
 
 ### Design Guidelines
 → Read [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md) for UI/UX rules
@@ -264,7 +264,7 @@ Every component is designed for touch:
 - Docker containerization
 - Nginx reverse proxy
 - Environment-based configuration
-- broad error handling
+- complete error handling
 - SQL injection protection
 
 ---
@@ -446,7 +446,7 @@ You now have a **complete, production-ready music player** with:
 ✅ Persistent queue and player state  
 ✅ External metadata enrichment  
 ✅ Docker deployment  
-✅ broad documentation  
+✅ complete documentation  
 
 **Everything is ready to go!**
 

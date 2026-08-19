@@ -16,7 +16,7 @@ def get_year_in_review(
     user_id: Optional[int] = Query(default=None),
     session: Session = Depends(get_session)
 ):
-    """Generate broad year-in-review analytics"""
+    """Generate complete year-in-review analytics"""
     return analytics_service.generate_year_in_review(session, user_id, year)
 
 @router.get("/analytics/real-time")
