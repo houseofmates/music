@@ -316,7 +316,7 @@ export const usePlayerStore = create((set, get) => ({
             const blobUrl = URL.createObjectURL(blob);
             const currentPos = audioRef.currentTime;
             
-            // Seamlessly swap source
+            // Swap source without interrupting playback
             audioRef.src = blobUrl;
             audioRef.currentTime = currentPos;
             audioRef.play().catch(() => {});
